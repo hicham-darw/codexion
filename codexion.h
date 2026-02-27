@@ -3,7 +3,7 @@
 
 # include <stdio.h>
 # include <stdlib.h>
-# include <string.h>
+# include <sys/time.h>
 # include <pthread.h> 
 # define INT_MAX 2147483647
 
@@ -27,6 +27,7 @@ typedef struct s_global
     int     dongle_cooldown;
     char    *schedular;
 
+    struct timeval  *start_time;
     struct s_coder *coders;
     struct s_dongle *dongles;
 }t_global;
@@ -41,6 +42,7 @@ typedef struct s_coder
 
     t_dongle    *left_dongle;
     t_dongle    *right_dongle;
+    t_global    *globals;
 
 }t_coder;
 

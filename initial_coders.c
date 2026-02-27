@@ -23,6 +23,8 @@ t_coder	*initial_coders(t_global **global_var)
 			coders[i].right_dongle = &((*global_var)->dongles[i + 1]);
 		else
 			coders[i].right_dongle = &((*global_var)->dongles[0]);
+		coders[i].globals = (*global_var);
+		coders[i].globals->start_time = NULL;
 		i ++;
 	}
 	return (coders);
