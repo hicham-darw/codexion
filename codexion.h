@@ -2,9 +2,11 @@
 # define CODEXION_H
 
 # include <stdio.h>
+# include <unistd.h>
 # include <stdlib.h>
 # include <sys/time.h>
 # include <pthread.h> 
+# include <stdbool.h>
 # define INT_MAX 2147483647
 
 // dongles
@@ -30,7 +32,15 @@ typedef struct s_global
     struct timeval  *start_time;
     struct s_coder *coders;
     struct s_dongle *dongles;
+    struct s_monitor *monitor;
+
 }t_global;
+
+typedef struct s_monitor
+{
+    pthread_t   thread;
+    int is_stop;
+}t_monitor;
 
 typedef struct s_coder
 {
@@ -60,9 +70,10 @@ int     add_parsed_number(t_global **storage, int number, int index);
 // initialize functions
 t_dongle    *initial_dongles(int number_of_coders);
 t_coder     *initial_coders(t_global **global_var);
-
+t_monitor   *initial_monitor(void);
 // routine function
 void    *start_routine(void *args);
+void    *monitor_routine(void *args);
 
 // free memory
 void free_data_input(t_global *args);

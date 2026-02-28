@@ -27,6 +27,7 @@ int main(int ac, char **av)
         free_global_var(global_var);
         return 42;
     }
+
     i = 0;
     while (i < global_var->number_of_coders)
     {
@@ -44,9 +45,26 @@ int main(int ac, char **av)
             free_global_var(global_var);
             return (42);
         }
+        i += 1;
+    }
+    i = 0;
+    while (i < global_var->number_of_coders)
+    {
         pthread_join(global_var->coders[i].thread, NULL);
         i += 1;
     }
+    global_var->monitor = initial_monitor();
+    if (!global_var->monitor)
+    {
+        free_global_var(global_var);
+        return (42);
+    }
+    if (pthread_create(&(global_var->monitor->thread), NULL, monitor_routine, NULL) != 0)
+    {
+        free_global_var(global_var);
+        return 42;
+    }
+    pthread_join(global_var->monitor->thread, NULL);
     free_global_var(global_var);
     return 0;
 }
