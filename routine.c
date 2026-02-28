@@ -17,7 +17,6 @@ void    *start_routine(void *args)
         return NULL;
     if (gettimeofday(coder->globals->start_time, NULL) != 0)
         return NULL;
-    return NULL;
     if(coder->id % 2 == 0)
     {
         if (!coder->left_dongle->is_taken)
@@ -25,33 +24,57 @@ void    *start_routine(void *args)
         if (!coder->right_dongle->is_taken)
             coder->right_dongle->is_taken = 1;
         coder->is_compiling = 1;
-        printf("ID: %d is compiling...!", coder->id);
+        printf("ID: %d is compiling...!\n", coder->id);
         usleep(coder->globals->time_to_compile);
+        coder->left_dongle->is_taken = 0;
+        coder->right_dongle->is_taken = 0;
         gettimeofday(coder->last_compile_time, NULL);
         usleep(coder->globals->time_to_debug);
-        printf("ID: %d is debugging...!", coder->id);
+        printf("ID: %d is debugging...!\n", coder->id);
         usleep(coder->globals->time_to_refactor);
+        printf("ID: %d is refactoring...!\n", coder->id);
 
     }
     else
     {
         usleep(coder->globals->time_to_compile);
-        while (true)
+        while (1)
         {
-            if (gettimeofday(&timeval, NULL) != 0)
-            {
-                printf("error");
-                return (NULL);
-            }
-            printf("timeval: %ld\n", timeval.tv_sec);
-            if ((long int)timeval.tv_sec - (long int)coder->globals->start_time->tv_sec < coder->globals->time_to_compile)
+            if (coder->left_dongle->is_taken);
                 continue;
-            if ((long int)timeval.tv_sec - (long int)coder->globals->start_time->tv_sec >= coder->globals->time_to_compile)
+            else
                 break;
-            printf("not NOw...\n %ld\n", (long int)timeval.tv_sec);
         }
-        printf("im waited time of of compile my ID: %d\n", coder->id);
-
+        coder->left_dongle->is_taken = 1;
+        printf("coder ID: %d taken left dongle....!\n", coder->id);
+        while (1)
+        {
+            if (coder->right_dongle->is_taken)
+                continue;
+            else
+                break;
+        }
+        coder->right_dongle->is_taken = 1;
+        printf("coder ID: %d taken right dongle....!\n", coder->id);
+        coder->is_compiling = 1;
+        printf("ID: %d is compiling...!\n", coder->id);
+        usleep(coder->globals->time_to_compile);
+        gettimeofday(coder->last_compile_time, NULL);
+        coder->left_dongle->is_taken = 0;
+        coder->right_dongle->is_taken = 0;
+        coder->is_compiling = 0;
+        coder->is_debugging = 1;
+        coder->is_refactoring = 0;
+        gettimeofday(coder->left_dongle->last_compile, NULL);        
+        gettimeofday(coder->right_dongle->last_compile, NULL);
+        // waiting dongle to finish cooldown time ....        
+        printf("ID: %d is debugging...!\n", coder->id);
+        usleep(coder->globals->time_to_debug);
+        coder->is_compiling = 0;
+        coder->is_debugging = 1;
+        coder->is_refactoring = 0;
+        printf("ID: %d is refactoring...!\n", coder->id);
+        usleep(coder->globals->time_to_refactor);
     }
     return NULL;
 }

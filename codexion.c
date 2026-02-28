@@ -37,6 +37,7 @@ int main(int ac, char **av)
         printf("-------------------------------->\n");
         i ++;
     }
+
     i = 0;
     while (i < global_var->number_of_coders)
     {
