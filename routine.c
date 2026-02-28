@@ -17,6 +17,7 @@ void    *start_routine(void *args)
         return NULL;
     if (gettimeofday(coder->globals->start_time, NULL) != 0)
         return NULL;
+    return NULL;
     if(coder->id % 2 == 0)
     {
         if (!coder->left_dongle->is_taken)
@@ -24,17 +25,13 @@ void    *start_routine(void *args)
         if (!coder->right_dongle->is_taken)
             coder->right_dongle->is_taken = 1;
         coder->is_compiling = 1;
+        printf("ID: %d is compiling...!", coder->id);
         usleep(coder->globals->time_to_compile);
-        printf("coder ID: %d is compiled!\n", coder->id);
+        gettimeofday(coder->last_compile_time, NULL);
         usleep(coder->globals->time_to_debug);
-        printf("coder ID: %d is debugged!\n", coder->id);
+        printf("ID: %d is debugging...!", coder->id);
         usleep(coder->globals->time_to_refactor);
-        printf("coder ID: %d is refactored!\n", coder->id);
-        coder->is_debugging = 0;
-        coder->is_refactoring = 0;
-        printf("coder ID: %d is compiling debugging refactoring...\n", coder->id);
-        printf("is taken l_dongle: %d\n", coder->left_dongle->is_taken);
-        printf("is taken r_dsongle: %d\n", coder->right_dongle->is_taken);
+
     }
     else
     {

@@ -50,6 +50,8 @@ typedef struct s_coder
     int is_debugging;
     int is_refactoring;
 
+    struct timeval *last_compile_time;
+
     t_dongle    *left_dongle;
     t_dongle    *right_dongle;
     t_global    *globals;
