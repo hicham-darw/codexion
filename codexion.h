@@ -30,10 +30,12 @@ typedef struct s_global
     int     dongle_cooldown;
     char    *schedular;
 
-    struct timeval  *start_time;
+    time_t  start_time;
     struct s_coder *coders;
     struct s_dongle *dongles;
     struct s_monitor *monitor;
+
+    pthread_mutex_t lock_g;
 
 }t_global;
 
@@ -51,7 +53,7 @@ typedef struct s_coder
     int is_debugging;
     int is_refactoring;
 
-    struct timeval *last_compile_time;
+    time_t last_compile_time;
 
     t_dongle    *left_dongle;
     t_dongle    *right_dongle;
@@ -78,6 +80,8 @@ t_monitor   *initial_monitor(void);
 void    *start_routine(void *args);
 void    *monitor_routine(void *args);
 
+// times function
+time_t  get_time_by_milisecond(void);
 // free memory
 void free_data_input(t_global *args);
 void free_global_var(t_global *global_var);

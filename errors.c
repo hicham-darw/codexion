@@ -15,8 +15,6 @@ void free_global_var(t_global *global_var)
     global_var->dongles = NULL;
     free_coders(global_var->coders);
     global_var->coders = NULL;
-    if (global_var->start_time)
-        free(global_var->start_time);
     free(global_var->monitor);
     free(global_var);
 }

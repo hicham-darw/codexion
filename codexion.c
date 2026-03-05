@@ -38,6 +38,7 @@ int main(int ac, char **av)
         i ++;
     }
 
+    pthread_mutex_init(&global_var->lock_g, NULL);
     i = 0;
     while (i < global_var->number_of_coders)
     {
@@ -54,6 +55,10 @@ int main(int ac, char **av)
         pthread_join(global_var->coders[i].thread, NULL);
         i += 1;
     }
+
+    pthread_mutex_destroy(&global_var->lock_g);
+
+    /////// just monitor------>
     global_var->monitor = initial_monitor();
     if (!global_var->monitor)
     {
