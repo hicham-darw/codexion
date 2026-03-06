@@ -13,6 +13,8 @@ t_dongle    *initial_dongles(int number_of_coders)
     {
         dongle[i].id = i + 1;
         dongle[i].is_taken = 0;
+        pthread_mutex_init(&dongle[i].mutex_dongle, NULL);
+        pthread_cond_init(&dongle[i].cond_dongle, NULL);
         i += 1;
     }
     return (dongle);

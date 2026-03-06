@@ -15,7 +15,8 @@ typedef struct s_dongle
     int     id;
     int     is_taken;
     struct timeval last_compile;
-    pthread_mutex_t lock;
+    pthread_mutex_t mutex_dongle;
+    pthread_cond_t  cond_dongle;
 }t_dongle;
 
 

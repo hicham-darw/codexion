@@ -56,9 +56,7 @@ int main(int ac, char **av)
         i += 1;
     }
 
-    pthread_mutex_destroy(&global_var->lock_g);
-
-    /////// just monitor------>
+    /////// monitor------>
     global_var->monitor = initial_monitor();
     if (!global_var->monitor)
     {
@@ -71,6 +69,7 @@ int main(int ac, char **av)
         return 42;
     }
     pthread_join(global_var->monitor->thread, NULL);
+    pthread_mutex_destroy(&global_var->lock_g);
     free_global_var(global_var);
     return 0;
 }
