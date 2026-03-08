@@ -7,6 +7,7 @@
 # include <sys/time.h>
 # include <pthread.h> 
 # include <stdbool.h>
+# include <time.h>
 # define INT_MAX 2147483647
 
 // dongles
