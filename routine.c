@@ -13,22 +13,10 @@ void release_dongles(t_coder *coder)
 
     left = coder->left_dongle;
     right = coder->right_dongle;
-    if (coder->id % 2){
-        pthread_mutex_lock(&left->mutex_dongle);
-        pthread_mutex_lock(&right->mutex_dongle);
-    }
-    else {
-        pthread_mutex_lock(&right->mutex_dongle);
-        pthread_mutex_lock(&left->mutex_dongle);
-    }
-
+    
     left->is_taken = 0;
     right->is_taken = 0;
-    if (coder->id % 2)
-        pthread_cond_signal(&right->cond_dongle);
-    else
-        pthread_cond_signal(&left->cond_dongle);
-
+    pthread_cond_signal(&left->cond_dongle);
     pthread_mutex_unlock(&left->mutex_dongle);
     pthread_mutex_unlock(&right->mutex_dongle);
 }
@@ -40,30 +28,48 @@ void take_dongles(t_coder *coder)
 
     left = coder->left_dongle;
     right = coder->right_dongle;
-    if (coder->id % 2)
+    if (!(coder->id % 2))
     {
         pthread_mutex_lock(&left->mutex_dongle);
         pthread_mutex_lock(&right->mutex_dongle);
+        if (left->is_taken || right->is_taken)
+        {
+            pthread_mutex_unlock(&left->mutex_dongle);
+            pthread_mutex_unlock(&right->mutex_dongle);
+            while (left->is_taken || right->is_taken)
+                pthread_cond_wait(&left->cond_dongle, &left->mutex_dongle);
+        }
+        else
+        {
+            left->is_taken = 1;
+            right->is_taken = 1;
+            pthread_mutex_lock(&coder->globals->mutex_print);
+            printf("coder %d is took left", coder->id);
+            printf("coder %d is took right", coder->id);
+            pthread_mutex_unlock(&coder->globals->mutex_print);
+        }
+
     }
     else
     {
         pthread_mutex_lock(&right->mutex_dongle);
         pthread_mutex_lock(&left->mutex_dongle);
+
+        if (right->is_taken || left->is_taken)
+        {
+            pthread_mutex_unlock(&right->mutex_dongle);
+            pthread_mutex_unlock(&left->mutex_dongle);
+            while (left->is_taken || right->is_taken)
+                pthread_cond_wait(&left->cond_dongle, &left->mutex_dongle);
+        }
+        left->is_taken = 1;
+        right->is_taken = 1;
+        pthread_mutex_lock(&coder->globals->mutex_print);
+        printf("coder %d is took left", coder->id);
+        printf("coder %d is took right", coder->id);
+        pthread_mutex_unlock(&coder->globals->mutex_print);
+        
     }
-    if (coder->id % 2)
-    {
-        while (left->is_taken || right->is_taken)
-            pthread_cond_wait(&right->cond_dongle, &right->mutex_dongle);
-    }
-    else
-    {
-        while (left->is_taken || right->is_taken)
-            pthread_cond_wait(&left->cond_dongle, &left->mutex_dongle);
-    }
-    right->is_taken = 1;
-    left->is_taken = 1;
-    pthread_mutex_unlock(&left->mutex_dongle);
-    pthread_mutex_unlock(&right->mutex_dongle);
 }
 
 void    *start_routine(void *args)
@@ -76,31 +82,39 @@ void    *start_routine(void *args)
     coder = (t_coder *)args;
     if (!coder)
         return NULL;
-
+    if ((coder->id % 2))
+        usleep(100);
+    pthread_mutex_lock(&coder->globals->mutex_time);
+    coder->start_time = get_time_by_milisecond();
+    printf("coder start time is : %ld\n", coder->start_time);
+    pthread_mutex_unlock(&coder->globals->mutex_time);
     while (1)
     {
         take_dongles(coder);
-        printf("Coder %d took left dongle\n", coder->id);
-        printf("Coder %d took right dongle\n", coder->id);
 
+        pthread_mutex_lock(&coder->globals->mutex_print);
         printf("Coder %d is compiling\n", coder->id);
-        sleep(5);
+        pthread_mutex_unlock(&coder->globals->mutex_print);
+        
+        usleep(coder->globals->time_to_compile * 1000);
+        
         release_dongles(coder);
-        // printf("Coder %d finished compiling\n", coder->id);
-        // if (coder->id % 2){
-        //     release_dongle(coder->left_dongle);
-        //     release_dongle(coder->right_dongle);
-        // } else {
-        //     release_dongle(coder->right_dongle);
-        //     release_dongle(coder->left_dongle);
-        // }
+
+        pthread_mutex_lock(&coder->globals->mutex_print);
         printf("Coder %d released dongles\n", coder->id);
+        pthread_mutex_unlock(&coder->globals->mutex_print);
 
+        pthread_mutex_lock(&coder->globals->mutex_print);
         printf("Coder %d is debugging\n", coder->id);
-        sleep(5);
+        pthread_mutex_unlock(&coder->globals->mutex_print);
 
+        usleep(coder->globals->time_to_debug * 1000);
+
+        pthread_mutex_lock(&coder->globals->mutex_print);
         printf("Coder %d is refactoring\n", coder->id);
-        sleep(5);
+        pthread_mutex_unlock(&coder->globals->mutex_print);
+        
+        usleep(coder->globals->time_to_refactor * 1000);
 
 
     }

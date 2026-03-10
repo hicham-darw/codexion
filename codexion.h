@@ -37,7 +37,8 @@ typedef struct s_global
     struct s_dongle *dongles;
     struct s_monitor *monitor;
 
-    pthread_mutex_t lock_g;
+    pthread_mutex_t mutex_time;
+    pthread_mutex_t mutex_print;
 
 }t_global;
 
@@ -56,7 +57,7 @@ typedef struct s_coder
     int is_refactoring;
 
     time_t last_compile_time;
-
+    time_t  start_time;
     t_dongle    *left_dongle;
     t_dongle    *right_dongle;
     t_global    *globals;

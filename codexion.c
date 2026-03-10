@@ -38,7 +38,8 @@ int main(int ac, char **av)
         i ++;
     }
 
-    pthread_mutex_init(&global_var->lock_g, NULL);
+    pthread_mutex_init(&global_var->mutex_print, NULL);
+    pthread_mutex_init(&global_var->mutex_time, NULL);
     i = 0;
     while (i < global_var->number_of_coders)
     {
@@ -69,7 +70,7 @@ int main(int ac, char **av)
         return 42;
     }
     pthread_join(global_var->monitor->thread, NULL);
-    pthread_mutex_destroy(&global_var->lock_g);
+    pthread_mutex_destroy(&global_var->mutex_print);
     free_global_var(global_var);
     return 0;
 }
