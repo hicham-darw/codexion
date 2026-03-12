@@ -5,7 +5,8 @@ void    *monitor_routine(void *args)
 {
     return (NULL);
 }
-// releasing both dongles should if cant release another dongle should put it to the desk!
+
+
 void release_dongles(t_coder *coder)
 {
     t_dongle *left;
@@ -44,8 +45,8 @@ void take_dongles(t_coder *coder)
             left->is_taken = 1;
             right->is_taken = 1;
             pthread_mutex_lock(&coder->globals->mutex_print);
-            printf("coder %d is took left", coder->id);
-            printf("coder %d is took right", coder->id);
+            printf("coder %d is took left\n", coder->id);
+            printf("coder %d is took right\n", coder->id);
             pthread_mutex_unlock(&coder->globals->mutex_print);
         }
 
@@ -65,8 +66,8 @@ void take_dongles(t_coder *coder)
         left->is_taken = 1;
         right->is_taken = 1;
         pthread_mutex_lock(&coder->globals->mutex_print);
-        printf("coder %d is took left", coder->id);
-        printf("coder %d is took right", coder->id);
+        printf("coder %d is took left\n", coder->id);
+        printf("coder %d is took right\n", coder->id);
         pthread_mutex_unlock(&coder->globals->mutex_print);
         
     }
@@ -82,8 +83,8 @@ void    *start_routine(void *args)
     coder = (t_coder *)args;
     if (!coder)
         return NULL;
-    if ((coder->id % 2))
-        usleep(100);
+    // if ((coder->id % 2))
+    //     usleep(499);
     pthread_mutex_lock(&coder->globals->mutex_time);
     coder->start_time = get_time_by_milisecond();
     printf("coder start time is : %ld\n", coder->start_time);

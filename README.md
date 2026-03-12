@@ -19,4 +19,12 @@ Codexion is a concurrency and synchronization challenge where you must orchestra
 a thread is defined as independent stream of instructions that can be scheduled to run as such by the operating system,
 for software developer is a procedure that runs independently!
 
-## What Are Pthread
+## What Is a multithreading?
+Multithreading is a CPU technique allowing a single process to split into multiple, independent execution units (threads) that run concurrently, enhancing performance and responsiveness. Threads share resources like memory, making them lightweight compared to separate processes. It is commonly used in web servers, gaming, and applications to handle tasks simultaneously.
+
+## Why Use Multithreading?
+With the introduction of multiple cores, multithreading has become extremely important in terms of the efficiency of your application. With multiple threads and a single core, your application would have to transition back and forth to give the illusion of multitasking.
+With multiple cores, your application can take advantage of the underlying hardware to run individual threads through a dedicated core, thus making your application more responsive and efficient. Multithreading basically allows you to take full advantage of your CPU and the multiple cores, so you don’t have untapped processing power with idle cores.
+- Higher throughput
+- Responsive applications that give the illusion of multitasking.
+- Efficient utilization of resources. Thread creation is light-weight in comparison to spawning a brand new - process and for web servers that use threads instead of creating a new process when fielding web requests, - consume far fewer resources
