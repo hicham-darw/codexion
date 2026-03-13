@@ -75,23 +75,27 @@ void take_dongles(t_coder *coder)
 
 void    *start_routine(void *args)
 {
-    t_dongle    *first, *last;
     t_coder *coder ;
-    struct timeval timeval;
     int     i;
 
     coder = (t_coder *)args;
     if (!coder)
         return NULL;
-    // if ((coder->id % 2))
-    //     usleep(499);
+    insert_coder_to_heap(&coder->globals->manager->heap, coder);
+    
     pthread_mutex_lock(&coder->globals->mutex_time);
-    coder->start_time = get_time_by_milisecond();
-    printf("coder start time is : %ld\n", coder->start_time);
+    coder->last_compile_time = get_time_by_milisecond();
     pthread_mutex_unlock(&coder->globals->mutex_time);
+    
+
     while (1)
     {
-        take_dongles(coder);
+        // take_dongles(coder);
+        pthread_mutex_lock(&coder->mutex_coder);
+        while (!coder->both_available)
+            pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
+        coder->both_available = 0;
+        pthread_mutex_unlock(&coder->mutex_coder);
 
         pthread_mutex_lock(&coder->globals->mutex_print);
         printf("Coder %d is compiling\n", coder->id);
@@ -99,7 +103,7 @@ void    *start_routine(void *args)
         
         usleep(coder->globals->time_to_compile * 1000);
         
-        release_dongles(coder);
+        // release_dongles(coder);
 
         pthread_mutex_lock(&coder->globals->mutex_print);
         printf("Coder %d released dongles\n", coder->id);
@@ -120,4 +124,15 @@ void    *start_routine(void *args)
 
     }
     return NULL;
+}
+
+
+
+void    *manager_routine(void *args)
+{
+    // t_manager *manager;
+
+    printf("Im, the Manager!\n");
+    // manager = (t_manager *)args;
+    return (NULL);
 }
