@@ -49,6 +49,7 @@ typedef struct s_manager
     
     t_dongle **dongles;
 
+    struct s_global    *globals;
     t_heap  *heap;
 }   t_manager;
 
@@ -65,12 +66,12 @@ typedef struct s_global
 
     time_t  start_time;
     
+    int     is_finished;
     struct s_coder *coders;
     struct s_dongle *dongles;
     struct s_monitor *monitor;
     struct s_manager *manager;
     struct s_heap   *heap;
-
     pthread_mutex_t mutex_time;
     pthread_mutex_t mutex_print;
 

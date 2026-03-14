@@ -90,6 +90,10 @@ void    *start_routine(void *args)
 
     while (1)
     {
+
+        //after entering to heap should wait manager to signaling them
+
+        // start compile -> debug ----> refactor
         // take_dongles(coder);
         pthread_mutex_lock(&coder->mutex_coder);
         while (!coder->both_available)
@@ -124,15 +128,4 @@ void    *start_routine(void *args)
 
     }
     return NULL;
-}
-
-
-
-void    *manager_routine(void *args)
-{
-    // t_manager *manager;
-
-    printf("Im, the Manager!\n");
-    // manager = (t_manager *)args;
-    return (NULL);
 }
