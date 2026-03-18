@@ -15,31 +15,75 @@ int     ft_isdigit(int c)
     return (c >= 48 && c <= 57);
 }
 
+int     real_number(const char *str)
+{
+    if (!str || !*str)
+        return (0);
+    
+    while (*str && *str == ' ')
+        str++;
+
+    if (*str == '+' || *str == '-')
+    {
+        if (*str == '-')
+            return (0);
+        str++;
+    }
+    if (*str < '0' || *str > '9')
+        return (0);
+    while (*str && *str >= '0' && *str <= '9')
+        str++;
+
+    while (*str && *str == ' ')
+        str++;
+    
+    if (!*str)
+        return (1);
+    return (0);
+}
+
 long long     ft_atoll(const char *str)
 {
     long long     res;
 
-
+    if (!real_number(str))
+        return (-1);
     res = 0;
     while(*str == ' ')
         str++;
     if (*str == '-' || *str == '+')
     {
         if (*str == '-')
-            return -1;
+            return (-1);
         str++;
     }
-    while (*str)
+    while (*str && *str >= '0' && *str <= '9')
     {
-        if (!ft_isdigit(*str))
-            return -1;
-        while (*str >= '0' && *str <= '9')
-        {
-            res = (res * 10) + (*str - '0');
-            str++;
-        }
+        res = (res * 10) + (*str - '0');
+        str++;
     }
-    return res;
+    return (res);
+}
+
+int     ft_isupper(int c)
+{
+    return (c >= 'A' && c <= 'Z');
+}
+
+char    *ft_strtolower(char *str)
+{
+    int     i;
+
+    if (!str)
+        return (NULL);
+    i = 0;
+    while (str[i])
+    {
+        if (ft_isupper(str[i]))
+            str[i] += 32;
+        i += 1;
+    }
+    return (str);
 }
 
 char    *ft_strdup(const char *str)
@@ -62,15 +106,13 @@ char    *ft_strdup(const char *str)
     return (ptr);
 }
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+int	ft_strcmp(const char *s1, const char *s2)
 {
 	size_t	i;
 
 	i = 0;
-	while (i < n && (s1[i] == s2[i]) && s1[i])
+	while (s1[i] && s2[i] && (s1[i] == s2[i]))
 		i++;
-	if (i == n)
-		return (0);
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 

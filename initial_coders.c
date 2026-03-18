@@ -12,6 +12,7 @@ t_coder	*initial_coders(t_global **global_var)
 	coders = malloc(sizeof(t_coder) * ((*global_var)->number_of_coders));
 	if (!coders)
 		return (NULL);
+	memset(coders, -0, sizeof(t_coder) * ((*global_var)->number_of_coders));
 	while (i < (*global_var)->number_of_coders)
 	{
 		coders[i].id = i + 1;
@@ -25,6 +26,8 @@ t_coder	*initial_coders(t_global **global_var)
 		else
 			coders[i].right_dongle = &((*global_var)->dongles[0]);
 		coders[i].globals = (*global_var);
+		pthread_mutex_init(&coders[i].mutex_coder, NULL);
+		pthread_cond_init(&coders[i].cond_coder, NULL);
 		i ++;
 	}
 	return (coders);

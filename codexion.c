@@ -31,23 +31,28 @@ int main(int ac, char **av)
     global_var->manager = initial_manager(global_var);
     global_var->heap = global_var->manager->heap;
 
-    i = 0;
-    while (i < global_var->number_of_coders)
-    {
-        printf("coder id : %d\n", global_var->coders[i].id);
-        printf("dongle left  id: %d\n", global_var->coders[i].left_dongle->id);
-        printf("dongle right id: %d\n", global_var->coders[i].right_dongle->id);
-        printf("-------------------------------->\n");
-        i ++;
-    }
+    // i = 0;
+    // while (i < global_var->number_of_coders)
+    // {
+    //     printf("coder id : %d\n", global_var->coders[i].id);
+    //     printf("dongle left  id: %d\n", global_var->coders[i].left_dongle->id);
+    //     printf("dongle right id: %d\n", global_var->coders[i].right_dongle->id);
+    //     printf("-------------------------------->\n");
+    //     i ++;
+    // }
 
     pthread_mutex_init(&global_var->mutex_print, NULL);
     pthread_mutex_init(&global_var->mutex_time, NULL);
     if (pthread_create(&global_var->manager->thread, NULL, manager_routine, global_var->manager) != 0)
     {
+        pthread_mutex_destroy(&global_var->mutex_print);
+        pthread_mutex_destroy(&global_var->mutex_time);
         free_global_var(global_var);
         return (42);
     }
+    pthread_mutex_lock(&global_var->mutex_time);
+    global_var->start_time = get_time_by_milisecond();
+    pthread_mutex_unlock(&global_var->mutex_time);
     i = 0;
     while (i < global_var->number_of_coders)
     {

@@ -95,17 +95,6 @@ int	is_dongles_available(t_coder * coder)
 	return ret_val;
 }
 
-void	lock_dongles(t_coder *coder)
-{
-	t_dongle	*left;
-	t_dongle 	*right;
-
-	left = coder->left_dongle;
-	right = coder->right_dongle;
-
-
-
-}
 
 void *manager_routine(void *arg)
 {
@@ -117,15 +106,15 @@ void *manager_routine(void *arg)
     {
         while (is_empty_heap(manager->heap))
 			usleep(500);
-
+		// i = 0;
+		// while (i < manager->heap->size)
+		// {
+		// 	printf("arrival[%d]: coder %d\n", i, manager->heap->coders[i]->id);
+		// 	i += 1;
+		// }
 		// Iterate over heap to find coders who can compile
         i = 0;
 		pthread_mutex_lock(&manager->heap->mutex_heap);
-		while (i < manager->heap->size){
-			printf("coder ID: %d\n", manager->heap->coders[i]->id);
-			i += 1;
-		}
-		i = 0;
         while (i < manager->heap->size)
         {
 			// printf("now heap is locked by manager\n");
@@ -135,10 +124,12 @@ void *manager_routine(void *arg)
                 coder = pop_heap_at(manager->heap, i); // remove coder from heap
                 pthread_cond_signal(&coder->cond_coder);
 			}
+			// else
+				// break;
 			i++;
         }
 		pthread_mutex_unlock(&manager->heap->mutex_heap);
-        // usleep(500);
+        usleep(100);
     }
 
     return NULL;

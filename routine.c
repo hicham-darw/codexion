@@ -25,7 +25,6 @@ void release_dongles(t_coder *coder)
     
     left->is_taken = 0;
     right->is_taken = 0;
-    pthread_cond_signal(&left->cond_dongle);
     pthread_mutex_unlock(&left->mutex_dongle);
     pthread_mutex_unlock(&right->mutex_dongle);
 }
@@ -99,15 +98,16 @@ void *coder_routine(void *arg)
         print_log(coder, "is compiling");        
         precise_sleep(coder->globals->time_to_compile);
 
+        coder->left_dongle->is_taken = 0;
+        coder->right_dongle->is_taken = 0;
+        pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+        pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);        
+
         // last_compile for FIFO and EDF
         pthread_mutex_lock(&coder->mutex_coder);
         coder->last_compile_time = get_time_by_milisecond();
         pthread_mutex_unlock(&coder->mutex_coder);
         
-        coder->left_dongle->is_taken = 0;
-        coder->right_dongle->is_taken = 0;
-        pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
-        pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);        
 
         //debugging....
         print_log(coder, "is debugging");

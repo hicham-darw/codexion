@@ -99,3 +99,24 @@ void heapify_up(t_heap *heap, int index)
         index = parent;
     }
 }
+
+void    push_to_heap(t_heap *heap, t_coder *coder)
+{
+    heap->coders[heap->size] = coder;
+    
+    heapify_up(heap, heap->size);
+    
+    heap->size ++;
+
+
+}
+
+int     is_top_of_heap(t_heap *heap, t_coder *coder)
+{
+    if (!heap || !coder)
+        return (0);
+    if (heap->coders[0] == coder)
+        return 1;
+    return 0;
+
+}

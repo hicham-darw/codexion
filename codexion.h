@@ -19,7 +19,6 @@ typedef struct s_dongle
     struct timeval last_compile;
         
     pthread_mutex_t mutex_dongle;
-    pthread_cond_t  cond_dongle;
 }t_dongle;
 
 typedef struct s_req
@@ -107,9 +106,9 @@ typedef struct s_coder
 size_t ft_strlen(const char *str);
 long long     ft_atoll(const char *str);
 char    *ft_strdup(const char *str);
-int	ft_strncmp(const char *s1, const char *s2, size_t n);
+int	ft_strcmp(const char *s1, const char *s2);
 char    *ft_strtrim(const char *str);
-
+char    *ft_strtolower(char *str);
 // parser functions
 t_global    *parse_arguments(char **argv);
 int     add_parsed_number(t_global **storage, int number, int index);
@@ -128,8 +127,9 @@ time_t  get_time_by_milisecond(void);
 // free memory
 void free_data_input(t_global *args);
 void free_global_var(t_global *global_var);
-void    free_coders(t_coder *coder);
-void    free_dongles(t_dongle *dongles);
+void    free_coders(t_coder *coder, int number_of_coders);
+void    free_dongles(t_dongle *dongles, int number_of_coders);
+void    free_manager(t_manager * manager);
 
 //manager functions
 t_manager   *initial_manager(t_global *global);
@@ -138,7 +138,9 @@ t_manager   *initial_manager(t_global *global);
 void    insert_coder_to_heap(t_heap *heap, t_coder *coder);
 void heapify_down(t_heap *heap, int index);
 void heapify_up(t_heap *heap, int index);
-t_coder *pop_heap_at(t_heap *heap, int);
+t_coder *pop_heap_at(t_heap *heap, int index);
+void    push_to_heap(t_heap *heap, t_coder *coder);
+
 
 // coder functions
 void swap_coders(t_coder **a, t_coder **b);

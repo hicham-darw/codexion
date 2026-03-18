@@ -33,9 +33,7 @@ t_global    *parse_arguments(char **av)
     valid_input = malloc(sizeof(t_global));
     if (!valid_input)
         return (NULL);
-    valid_input->schedular = NULL;
-    valid_input->coders = NULL;
-    valid_input->dongles = NULL;
+    memset(valid_input, 0, sizeof(t_global));
     i = 0;
     while (av[i] && i < 7)
     {
@@ -43,7 +41,7 @@ t_global    *parse_arguments(char **av)
         if (parsed_number < 0 || parsed_number == 0 && i == 0 || parsed_number > INT_MAX)
         {
             free_global_var(valid_input);
-            perror("args cannot be negative number or zero");
+            fprintf(stderr, "invalid args must be greather than 0 and less than or equal 200\n");
             return (NULL);
         }
         if (add_parsed_number(&valid_input, parsed_number, i) <= 0)
@@ -51,20 +49,18 @@ t_global    *parse_arguments(char **av)
             free_global_var(valid_input);
             return (NULL);
         }
-        printf("parsed number %d: %lld\n", i, parsed_number);
+        // printf("parsed number %d: %lld\n", i, parsed_number);
         i += 1;
     }
     char *schedular = ft_strtrim(av[i]);
     if (
         !schedular
-        || (ft_strncmp(schedular, "fifo", ft_strlen(schedular))
-        && ft_strncmp(schedular, "edf", ft_strlen(schedular)))
+        || (ft_strcmp(ft_strtolower(schedular), "fifo")
+        && ft_strcmp(ft_strtolower(schedular), "edf"))
     )
     {
-        if (schedular)
-            free(schedular);
         free_global_var(valid_input);
-        fprintf(stderr, "Error: schedular must be <fifo> or <edf>");
+        fprintf(stderr, "Error: schedular must be <fifo> or <edf>\n");
         return (NULL);
     }
     valid_input->schedular = schedular;
