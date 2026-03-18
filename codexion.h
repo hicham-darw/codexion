@@ -34,8 +34,6 @@ typedef struct s_heap
 {
     struct s_coder  **coders;
     
-    int schedular;  // FIFO=1; EDF=0
-    int new_elem;
     int size;
     int capacity;
 
@@ -92,9 +90,11 @@ typedef struct s_coder
     int is_compiling;
     int is_debugging;
     int is_refactoring;
+    int number_of_compilling;
 
     time_t last_compile_time;
     time_t  start_time;
+
     t_dongle    *left_dongle;
     t_dongle    *right_dongle;
     t_global    *globals;
@@ -119,7 +119,7 @@ t_dongle    *initial_dongles(int number_of_coders);
 t_coder     *initial_coders(t_global **global_var);
 t_monitor   *initial_monitor(void);
 // routine function
-void    *start_routine(void *args);
+void    *coder_routine(void *args);
 void    *monitor_routine(void *args);
 void    *manager_routine(void *args);
 
@@ -135,6 +135,17 @@ void    free_dongles(t_dongle *dongles);
 t_manager   *initial_manager(t_global *global);
 
 // heap functions
-void    insert_coder_to_heap(t_heap **heap, t_coder *coder);
+void    insert_coder_to_heap(t_heap *heap, t_coder *coder);
+void heapify_down(t_heap *heap, int index);
+void heapify_up(t_heap *heap, int index);
+t_coder *pop_heap_at(t_heap *heap, int);
+
+// coder functions
+void swap_coders(t_coder **a, t_coder **b);
+
+// print_log
+void	print_log(t_coder *coder, char *msg);
+void precise_sleep(long time_ms);
+
 
 #endif

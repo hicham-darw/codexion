@@ -6,6 +6,14 @@ void    *monitor_routine(void *args)
     return (NULL);
 }
 
+void swap_coders(t_coder **a, t_coder **b)
+{
+    t_coder *tmp;
+
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
 
 void release_dongles(t_coder *coder)
 {
@@ -29,103 +37,86 @@ void take_dongles(t_coder *coder)
 
     left = coder->left_dongle;
     right = coder->right_dongle;
-    if (!(coder->id % 2))
+    if (coder->id % 2)
     {
         pthread_mutex_lock(&left->mutex_dongle);
-        pthread_mutex_lock(&right->mutex_dongle);
-        if (left->is_taken || right->is_taken)
-        {
-            pthread_mutex_unlock(&left->mutex_dongle);
-            pthread_mutex_unlock(&right->mutex_dongle);
-            while (left->is_taken || right->is_taken)
-                pthread_cond_wait(&left->cond_dongle, &left->mutex_dongle);
-        }
-        else
-        {
-            left->is_taken = 1;
-            right->is_taken = 1;
-            pthread_mutex_lock(&coder->globals->mutex_print);
-            printf("coder %d is took left\n", coder->id);
-            printf("coder %d is took right\n", coder->id);
-            pthread_mutex_unlock(&coder->globals->mutex_print);
-        }
-
+        pthread_mutex_lock(&right->mutex_dongle);        
     }
     else
     {
         pthread_mutex_lock(&right->mutex_dongle);
         pthread_mutex_lock(&left->mutex_dongle);
-
-        if (right->is_taken || left->is_taken)
-        {
-            pthread_mutex_unlock(&right->mutex_dongle);
-            pthread_mutex_unlock(&left->mutex_dongle);
-            while (left->is_taken || right->is_taken)
-                pthread_cond_wait(&left->cond_dongle, &left->mutex_dongle);
-        }
-        left->is_taken = 1;
-        right->is_taken = 1;
-        pthread_mutex_lock(&coder->globals->mutex_print);
-        printf("coder %d is took left\n", coder->id);
-        printf("coder %d is took right\n", coder->id);
-        pthread_mutex_unlock(&coder->globals->mutex_print);
-        
     }
+    left->is_taken = 1;
+    right->is_taken = 1;
+    pthread_mutex_lock(&coder->globals->mutex_print);
+    printf("coder %d is took left\n", coder->id);
+    printf("coder %d is took right\n", coder->id);
+    pthread_mutex_unlock(&coder->globals->mutex_print);
+
+
 }
 
-void    *start_routine(void *args)
+void    put_dongles(t_coder *coder)
 {
-    t_coder *coder ;
-    int     i;
+    pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+    pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
+}
 
-    coder = (t_coder *)args;
-    if (!coder)
-        return NULL;
-    insert_coder_to_heap(&coder->globals->manager->heap, coder);
-    
-    pthread_mutex_lock(&coder->globals->mutex_time);
-    coder->last_compile_time = get_time_by_milisecond();
-    pthread_mutex_unlock(&coder->globals->mutex_time);
-    
+void *coder_routine(void *arg)
+{
+    t_coder *coder = (t_coder *)arg;
 
-    while (1)
+    while (!coder->globals->is_finished)
     {
-
-        //after entering to heap should wait manager to signaling them
-
-        // start compile -> debug ----> refactor
-        // take_dongles(coder);
+        // locking coder for store time of starting routine
         pthread_mutex_lock(&coder->mutex_coder);
-        while (!coder->both_available)
-            pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
-        coder->both_available = 0;
+        if (!coder->number_of_compilling)
+            coder->start_time = get_time_by_milisecond();
         pthread_mutex_unlock(&coder->mutex_coder);
 
-        pthread_mutex_lock(&coder->globals->mutex_print);
-        printf("Coder %d is compiling\n", coder->id);
-        pthread_mutex_unlock(&coder->globals->mutex_print);
+        // insert_coder_to_heap()
+        insert_coder_to_heap(coder->globals->heap, coder);
+
+        pthread_mutex_lock(&coder->mutex_coder);
+        while (coder->left_dongle->is_taken || coder->right_dongle->is_taken)
+            pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
+        pthread_mutex_unlock(&coder->mutex_coder);
+
+        if (coder->id % 2)
+        {
+            pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+            pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
+        }
+        else
+        {
+            pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
+            pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+        }
+    
+        coder->left_dongle->is_taken = 1;
+        coder->right_dongle->is_taken = 1;
+        print_log(coder, "is compiling");        
+        precise_sleep(coder->globals->time_to_compile);
+
+        // last_compile for FIFO and EDF
+        pthread_mutex_lock(&coder->mutex_coder);
+        coder->last_compile_time = get_time_by_milisecond();
+        pthread_mutex_unlock(&coder->mutex_coder);
         
-        usleep(coder->globals->time_to_compile * 1000);
-        
-        // release_dongles(coder);
+        coder->left_dongle->is_taken = 0;
+        coder->right_dongle->is_taken = 0;
+        pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+        pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);        
 
-        pthread_mutex_lock(&coder->globals->mutex_print);
-        printf("Coder %d released dongles\n", coder->id);
-        pthread_mutex_unlock(&coder->globals->mutex_print);
+        //debugging....
+        print_log(coder, "is debugging");
+        precise_sleep(coder->globals->time_to_debug);
 
-        pthread_mutex_lock(&coder->globals->mutex_print);
-        printf("Coder %d is debugging\n", coder->id);
-        pthread_mutex_unlock(&coder->globals->mutex_print);
-
-        usleep(coder->globals->time_to_debug * 1000);
-
-        pthread_mutex_lock(&coder->globals->mutex_print);
-        printf("Coder %d is refactoring\n", coder->id);
-        pthread_mutex_unlock(&coder->globals->mutex_print);
-        
-        usleep(coder->globals->time_to_refactor * 1000);
-
-
+        // refactoring .....
+        print_log(coder, "is refactoring");
+        precise_sleep(coder->globals->time_to_refactor);
     }
+
     return NULL;
 }

@@ -29,10 +29,7 @@ int main(int ac, char **av)
     }
 
     global_var->manager = initial_manager(global_var);
-    // printf("heap coders: %p\n", global_var->heap->coders);
-    // printf("schedular: %d\n", global_var->heap->schedular);
-    // printf("new_elem: %d\n", global_var->heap->new_elem);
-    //for heaaaaaaaaaaaap_queueeee
+    global_var->heap = global_var->manager->heap;
 
     i = 0;
     while (i < global_var->number_of_coders)
@@ -54,7 +51,7 @@ int main(int ac, char **av)
     i = 0;
     while (i < global_var->number_of_coders)
     {
-        if(pthread_create(&(global_var->coders[i].thread), NULL, &start_routine, &(global_var->coders[i])) != 0)
+        if(pthread_create(&(global_var->coders[i].thread), NULL, coder_routine, &(global_var->coders[i])) != 0)
         {
             free_global_var(global_var);
             return (42);
@@ -62,7 +59,6 @@ int main(int ac, char **av)
         i += 1;
     }
     pthread_join(global_var->manager->thread, NULL);
-    printf("11\n");
     i = 0;
     while (i < global_var->number_of_coders)
     {

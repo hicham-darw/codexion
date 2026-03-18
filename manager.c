@@ -37,11 +37,6 @@ t_manager	*initial_manager(t_global *global)
 		free(manager->heap);
 		return (NULL);
 	}
-	if (!strcmp(global->schedular, "fifo") || !strcmp(global->schedular, "FIFO"))
-		manager->heap->schedular = 1;
-	else
-		manager->heap->schedular = 0;
-	manager->heap->new_elem = 0;
 	manager->heap->size = 0;
 	manager->heap->capacity = global->number_of_coders;
 	manager->globals = global;
@@ -52,43 +47,25 @@ t_manager	*initial_manager(t_global *global)
 
 int		is_empty_heap(t_heap *heap)
 {
-	int	is_empty;
+	int		ret_val;
 
 	pthread_mutex_lock(&heap->mutex_heap);
-	if (!heap->size)
-		is_empty = 1;
+	if (!heap || !heap->size)
+		ret_val = 1;
 	else
-		is_empty = 0;
+		ret_val = 0;
 	pthread_mutex_unlock(&heap->mutex_heap);
-
-	return is_empty;
+	return ret_val;
 }
 
-t_coder *pop_heap(t_heap **heap)
-{
-	t_heap *head;
-	t_coder	*coder;
-	int		i;
-
-	if (!heap)
-		return (NULL);
-	coder = (*heap)->coders[0];
-	i = 1;
-	while (i < (*heap)->size)
-	{
-		heap[i - 1] = heap[i]; 
-		i += 1;
-	}
-	(*heap)->size -= 1;
-	return coder;
-}
 
 void wake_coder(t_coder *coder)
 {
     pthread_mutex_lock(&coder->mutex_coder);
 
     coder->both_available = 1;
-
+	coder->left_dongle->is_taken = 1;
+	coder->right_dongle->is_taken = 1;
     pthread_cond_signal(&coder->cond_coder);
 
     pthread_mutex_unlock(&coder->mutex_coder);
@@ -96,55 +73,72 @@ void wake_coder(t_coder *coder)
 
 int	is_dongles_available(t_coder * coder)
 {
-	t_dongle *left;
-	t_dongle *right;
+	int		ret_val;
 
-	printf("here!1!\n");
-	int		available = 0;
 	if (coder->id % 2)
 	{
-		pthread_mutex_lock(&left->mutex_dongle);
-		pthread_mutex_lock(&right->mutex_dongle);
+		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+		pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
 	}
 	else
 	{
-		pthread_mutex_lock(&right->mutex_dongle);
-		pthread_mutex_lock(&left->mutex_dongle);
+		pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
+		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
 	}
-	if (left->is_taken || right->is_taken)
-	{
-		pthread_mutex_unlock(&right->mutex_dongle);
-		pthread_mutex_unlock(&left->mutex_dongle);
-		return 0;
-	}
+	if (!coder->left_dongle->is_taken && !coder->right_dongle->is_taken)
+		ret_val = 1;
 	else
-		return 1;
+		ret_val = 0;
+	pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+	pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
+
+	return ret_val;
+}
+
+void	lock_dongles(t_coder *coder)
+{
+	t_dongle	*left;
+	t_dongle 	*right;
+
+	left = coder->left_dongle;
+	right = coder->right_dongle;
+
+
+
 }
 
 void *manager_routine(void *arg)
 {
     t_manager *manager = (t_manager *)arg;
     t_coder *coder;
+    int i;
 
-    while (!manager->globals->is_finished)
+    while (/*!manager->globals->is_finished*/1)
     {
-        pthread_mutex_lock(&manager->heap->mutex_heap);
-
         while (is_empty_heap(manager->heap))
-            pthread_cond_wait(&manager->heap->cond_heap, &manager->heap->mutex_heap);
-		coder = manager->heap->coders[0];
-		if (is_dongles_available(coder))
-		{
-			coder = pop_heap(&manager->heap);
-			wake_coder(coder);
-		}
-		else
-			coder = pop_heap(&manager->heap);
-		/// continue here read about insert dletee element in heap how queue can give coders signals to wakeup and run independently!
-		
-        pthread_mutex_unlock(&manager->heap->mutex_heap);
+			usleep(500);
 
-        wake_coder(coder);
+		// Iterate over heap to find coders who can compile
+        i = 0;
+		pthread_mutex_lock(&manager->heap->mutex_heap);
+		while (i < manager->heap->size){
+			printf("coder ID: %d\n", manager->heap->coders[i]->id);
+			i += 1;
+		}
+		i = 0;
+        while (i < manager->heap->size)
+        {
+			// printf("now heap is locked by manager\n");
+            coder = manager->heap->coders[i];
+			if (is_dongles_available(coder))
+            {
+                coder = pop_heap_at(manager->heap, i); // remove coder from heap
+                pthread_cond_signal(&coder->cond_coder);
+			}
+			i++;
+        }
+		pthread_mutex_unlock(&manager->heap->mutex_heap);
+        // usleep(500);
     }
 
     return NULL;
