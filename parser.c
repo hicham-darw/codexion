@@ -22,18 +22,11 @@ int    add_parsed_number(t_global **global, int number, int index)
     return 1;
 }
 
-t_global    *parse_arguments(char **av)
+t_global    *parse_numbers(t_global *valid_input, char **av)
 {
-    long long     parsed_number;
-    t_global     *valid_input;
+    int     parsed_number;
     int     i;
 
-    if (!av || !*av)
-        return (NULL);
-    valid_input = malloc(sizeof(t_global));
-    if (!valid_input)
-        return (NULL);
-    memset(valid_input, 0, sizeof(t_global));
     i = 0;
     while (av[i] && i < 7)
     {
@@ -49,20 +42,42 @@ t_global    *parse_arguments(char **av)
             free_global_var(valid_input);
             return (NULL);
         }
-        // printf("parsed number %d: %lld\n", i, parsed_number);
         i += 1;
     }
-    char *schedular = ft_strtrim(av[i]);
-    if (
-        !schedular
-        || (ft_strcmp(ft_strtolower(schedular), "fifo")
-        && ft_strcmp(ft_strtolower(schedular), "edf"))
-    )
-    {
-        free_global_var(valid_input);
-        fprintf(stderr, "Error: schedular must be <fifo> or <edf>\n");
+    return (valid_input);
+}
+
+char    *parse_schedular(char *arg)
+{
+    char    *schedular;
+    int     cmp_1;
+    int     cmp_2;
+
+    schedular = ft_strtrim(arg);
+    if (!schedular)
         return (NULL);
-    }
-    valid_input->schedular = schedular;
+    cmp_1 = ft_strcmp(ft_strtolower(schedular), "fifo");
+    cmp_2 = ft_strcmp(ft_strtolower(schedular), "edf");
+
+    if (cmp_1 && cmp_2)
+        return (NULL);
+    return (schedular);
+}
+
+
+t_global    *parse_arguments(char **av)
+{
+    long long     parsed_number;
+    t_global     *valid_input;
+    int     i;
+
+    if (!av || !*av)
+        return (NULL);
+    valid_input = malloc(sizeof(t_global));
+    if (!valid_input)
+        return (NULL);
+    memset(valid_input, 0, sizeof(t_global));
+    valid_input = parse_numbers(valid_input, av);
+    valid_input->schedular = parse_schedular(av[7]);
     return (valid_input);
 }

@@ -82,22 +82,11 @@ void *coder_routine(void *arg)
             pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
         pthread_mutex_unlock(&coder->mutex_coder);
 
-        if (coder->id % 2)
-        {
-            pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
-            pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
-        }
-        else
-        {
-            pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
-            pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
-        }
-    
-        coder->left_dongle->is_taken = 1;
-        coder->right_dongle->is_taken = 1;
         print_log(coder, "is compiling");        
         precise_sleep(coder->globals->time_to_compile);
-
+        
+        pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+        pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
         coder->left_dongle->is_taken = 0;
         coder->right_dongle->is_taken = 0;
         pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);

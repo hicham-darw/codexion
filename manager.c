@@ -12,10 +12,8 @@ t_manager	*initial_manager(t_global *global)
 		return (NULL);
 	manager->dongles = (t_dongle **)malloc(sizeof(t_dongle *) * global->number_of_coders);
 	if (!manager->dongles)
-	{
-		free(manager);
 		return (NULL);
-	}
+
 	i = 0;
 	while (i < global->number_of_coders)
 	{
@@ -24,19 +22,10 @@ t_manager	*initial_manager(t_global *global)
 	}
 	manager->heap = malloc(sizeof(t_heap));
 	if (!manager->heap)
-	{
-		free(manager);
-		free(manager->dongles);
 		return (NULL);
-	}
 	manager->heap->coders = (t_coder **)malloc(sizeof(t_coder *) * global->number_of_coders);
 	if (!manager->heap->coders)
-	{
-		free(manager);
-		free(manager->dongles);
-		free(manager->heap);
 		return (NULL);
-	}
 	manager->heap->size = 0;
 	manager->heap->capacity = global->number_of_coders;
 	manager->globals = global;
@@ -45,7 +34,7 @@ t_manager	*initial_manager(t_global *global)
 	return (manager);
 }
 
-int		is_empty_heap(t_heap *heap)
+int		is_empty_heap(t_heap *heap, int number_of_coders)
 {
 	int		ret_val;
 
@@ -85,6 +74,7 @@ int	is_dongles_available(t_coder * coder)
 		pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
 		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
 	}
+	
 	if (!coder->left_dongle->is_taken && !coder->right_dongle->is_taken)
 		ret_val = 1;
 	else
@@ -102,17 +92,10 @@ void *manager_routine(void *arg)
     t_coder *coder;
     int i;
 
-    while (/*!manager->globals->is_finished*/1)
+	while (/*!manager->globals->is_finished*/1)
     {
-        while (is_empty_heap(manager->heap))
+        while (is_empty_heap(manager->heap, manager->globals->number_of_coders))
 			usleep(500);
-		// i = 0;
-		// while (i < manager->heap->size)
-		// {
-		// 	printf("arrival[%d]: coder %d\n", i, manager->heap->coders[i]->id);
-		// 	i += 1;
-		// }
-		// Iterate over heap to find coders who can compile
         i = 0;
 		pthread_mutex_lock(&manager->heap->mutex_heap);
         while (i < manager->heap->size)
@@ -121,16 +104,19 @@ void *manager_routine(void *arg)
             coder = manager->heap->coders[i];
 			if (is_dongles_available(coder))
             {
+				// problem here and coder routine managed by
+				// about dongles and race condition 
                 coder = pop_heap_at(manager->heap, i); // remove coder from heap
-                pthread_cond_signal(&coder->cond_coder);
+				pthread_mutex_lock(&coder->mutex_coder);
+				pthread_cond_signal(&coder->cond_coder);
+				pthread_mutex_unlock(&coder->mutex_coder);
 			}
-			// else
-				// break;
+			else
+				break;
 			i++;
-        }
-		pthread_mutex_unlock(&manager->heap->mutex_heap);
-        usleep(100);
-    }
-
+			pthread_mutex_unlock(&manager->heap->mutex_heap);
+			usleep(500);
+   		}
+	}
     return NULL;
 }

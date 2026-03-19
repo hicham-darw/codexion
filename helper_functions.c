@@ -59,6 +59,8 @@ long long     ft_atoll(const char *str)
     }
     while (*str && *str >= '0' && *str <= '9')
     {
+        if (res > INT_MAX)
+            return (-1);
         res = (res * 10) + (*str - '0');
         str++;
     }
@@ -115,7 +117,6 @@ int	ft_strcmp(const char *s1, const char *s2)
 		i++;
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
-
 
 char    *ft_strtrim(const char *str)
 {

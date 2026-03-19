@@ -7,8 +7,8 @@
 # include <sys/time.h>
 # include <pthread.h> 
 # include <string.h>
-# include <time.h>
-# define INT_MAX 2147483647
+# include <limits.h>
+
 
 // dongles
 typedef struct s_dongle
@@ -109,14 +109,21 @@ char    *ft_strdup(const char *str);
 int	ft_strcmp(const char *s1, const char *s2);
 char    *ft_strtrim(const char *str);
 char    *ft_strtolower(char *str);
+int     valid_schedular(char *schedular);
+
 // parser functions
 t_global    *parse_arguments(char **argv);
 int     add_parsed_number(t_global **storage, int number, int index);
 
 // initialize functions
+int     initializer(t_global **global_var);
 t_dongle    *initial_dongles(int number_of_coders);
 t_coder     *initial_coders(t_global **global_var);
 t_monitor   *initial_monitor(void);
+
+// creater functions
+int     create_threads(t_global *global_var);
+int     join_threads(t_global *globals_var);
 // routine function
 void    *coder_routine(void *args);
 void    *monitor_routine(void *args);
@@ -144,6 +151,9 @@ void    push_to_heap(t_heap *heap, t_coder *coder);
 
 // coder functions
 void swap_coders(t_coder **a, t_coder **b);
+
+//dongles functions
+int    is_dongles_available(t_coder *coder);
 
 // print_log
 void	print_log(t_coder *coder, char *msg);

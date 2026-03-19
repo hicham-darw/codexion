@@ -1,0 +1,58 @@
+#include "codexion.h"
+
+int     create_manager_thread(t_global *global_var)
+{
+    if (pthread_create(&global_var->manager->thread, NULL, manager_routine, global_var->manager))
+    {
+        pthread_mutex_destroy(&global_var->mutex_print);
+        pthread_mutex_destroy(&global_var->mutex_time);
+        free_global_var(global_var);
+        return (0);
+    }
+    return (1);
+}
+int     create_coder_thread(t_global *global_var)
+{
+    int     i;
+
+    i = -1;
+    while (++i < global_var->number_of_coders)
+    {
+        if(pthread_create(&(global_var->coders[i].thread), NULL, coder_routine, &(global_var->coders[i])) != 0)
+        {
+            pthread_mutex_destroy(&global_var->mutex_print);
+            pthread_mutex_destroy(&global_var->mutex_time);
+            free_global_var(global_var);
+            return (0);
+        }
+    }
+    return (1);
+}
+
+int     create_monitor_thread(t_global *global_var)
+{
+    if (pthread_create(&(global_var->monitor->thread), NULL, monitor_routine, NULL))
+    {
+        free_global_var(global_var);
+        return (0);
+    }
+    return (1);
+}
+
+int     create_threads(t_global *global_var)
+{
+    printf("manager joined\n");
+    if (!create_manager_thread(global_var))
+        return (0);
+
+        pthread_mutex_lock(&global_var->mutex_time);
+    global_var->start_time = get_time_by_milisecond();
+    pthread_mutex_unlock(&global_var->mutex_time);
+
+    if (!create_coder_thread(global_var))
+        return (0);
+
+    if (!create_monitor_thread(global_var))
+        return (0);    
+    return (1);    
+}

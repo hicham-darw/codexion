@@ -15,75 +15,14 @@ int main(int ac, char **av)
     global_var = parse_arguments(av + 1);
     if (!global_var)
         return (42);
-    global_var->dongles = initial_dongles(global_var->number_of_coders);
-    if (!global_var->dongles)
-    {
-        free_global_var(global_var);
+    if (
+        !initializer(&global_var)
+        || !create_threads(global_var)
+        || !join_threads(global_var)
+    )
         return (42);
-    }
-    global_var->coders = initial_coders(&global_var);
-    if (!global_var->coders)
-    {
-        free_global_var(global_var);
-        return 42;
-    }
 
-    global_var->manager = initial_manager(global_var);
-    global_var->heap = global_var->manager->heap;
-
-    // i = 0;
-    // while (i < global_var->number_of_coders)
-    // {
-    //     printf("coder id : %d\n", global_var->coders[i].id);
-    //     printf("dongle left  id: %d\n", global_var->coders[i].left_dongle->id);
-    //     printf("dongle right id: %d\n", global_var->coders[i].right_dongle->id);
-    //     printf("-------------------------------->\n");
-    //     i ++;
-    // }
-
-    pthread_mutex_init(&global_var->mutex_print, NULL);
-    pthread_mutex_init(&global_var->mutex_time, NULL);
-    if (pthread_create(&global_var->manager->thread, NULL, manager_routine, global_var->manager) != 0)
-    {
-        pthread_mutex_destroy(&global_var->mutex_print);
-        pthread_mutex_destroy(&global_var->mutex_time);
-        free_global_var(global_var);
-        return (42);
-    }
-    pthread_mutex_lock(&global_var->mutex_time);
-    global_var->start_time = get_time_by_milisecond();
-    pthread_mutex_unlock(&global_var->mutex_time);
-    i = 0;
-    while (i < global_var->number_of_coders)
-    {
-        if(pthread_create(&(global_var->coders[i].thread), NULL, coder_routine, &(global_var->coders[i])) != 0)
-        {
-            free_global_var(global_var);
-            return (42);
-        }
-        i += 1;
-    }
-    pthread_join(global_var->manager->thread, NULL);
-    i = 0;
-    while (i < global_var->number_of_coders)
-    {
-        pthread_join(global_var->coders[i].thread, NULL);
-        i += 1;
-    }
-
-    /////// monitor------>
-    global_var->monitor = initial_monitor();
-    if (!global_var->monitor)
-    {
-        free_global_var(global_var);
-        return (42);
-    }
-    if (pthread_create(&(global_var->monitor->thread), NULL, monitor_routine, NULL) != 0)
-    {
-        free_global_var(global_var);
-        return 42;
-    }
-    pthread_join(global_var->monitor->thread, NULL);
+    pthread_mutex_destroy(&global_var->mutex_print);
     pthread_mutex_destroy(&global_var->mutex_print);
     free_global_var(global_var);
     return 0;
