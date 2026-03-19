@@ -76,11 +76,17 @@ int	is_dongles_available(t_coder * coder)
 	}
 	
 	if (!coder->left_dongle->is_taken && !coder->right_dongle->is_taken)
+	{
+		coder->left_dongle->is_taken = 1;
+		coder->right_dongle->is_taken = 1;
 		ret_val = 1;
+	}
 	else
+	{
 		ret_val = 0;
-	pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
-	pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
+		pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+		pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
+	}
 
 	return ret_val;
 }
@@ -96,27 +102,23 @@ void *manager_routine(void *arg)
     {
         while (is_empty_heap(manager->heap, manager->globals->number_of_coders))
 			usleep(500);
-        i = 0;
 		pthread_mutex_lock(&manager->heap->mutex_heap);
+        i = 0;
         while (i < manager->heap->size)
         {
 			// printf("now heap is locked by manager\n");
             coder = manager->heap->coders[i];
 			if (is_dongles_available(coder))
             {
-				// problem here and coder routine managed by
-				// about dongles and race condition 
-                coder = pop_heap_at(manager->heap, i); // remove coder from heap
 				pthread_mutex_lock(&coder->mutex_coder);
+				coder->can_compile = 1;
 				pthread_cond_signal(&coder->cond_coder);
 				pthread_mutex_unlock(&coder->mutex_coder);
 			}
-			else
-				break;
 			i++;
-			pthread_mutex_unlock(&manager->heap->mutex_heap);
-			usleep(500);
-   		}
+		}
+		pthread_mutex_unlock(&manager->heap->mutex_heap);
+		usleep(500);
 	}
     return NULL;
 }
