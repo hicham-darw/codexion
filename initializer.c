@@ -1,7 +1,6 @@
 # include "codexion.h"
 
-
-int     initializer(t_global **global_var)
+int initial_dongles_and_coders_and_heap(t_global **global_var)
 {
     (*global_var)->dongles = initial_dongles((*global_var)->number_of_coders);
     if (!(*global_var)->dongles)
@@ -16,12 +15,28 @@ int     initializer(t_global **global_var)
         return (0);
     }
 
+    (*global_var)->heap = malloc(sizeof(t_heap));
+    if (!(*global_var)->heap)
+    {
+        free_global_var((*global_var));
+        return (0);
+    }
+
+
+    return (1);
+}
+
+int     initializer(t_global **global_var)
+{
+    if (!initial_dongles_and_coders_and_heap(global_var))
+        return (0);
     (*global_var)->manager = initial_manager((*global_var));
     if (!(*global_var)->manager)
     {
         free_global_var((*global_var));
         return (0);
     }
+    printf("OKOK!!\n");
     (*global_var)->heap = (*global_var)->manager->heap;
 
     (*global_var)->monitor = initial_monitor();

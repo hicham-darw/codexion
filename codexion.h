@@ -35,9 +35,7 @@ typedef struct s_heap
     
     int size;
     int capacity;
-
     pthread_mutex_t mutex_heap;
-    pthread_cond_t cond_heap;
 }   t_heap;
 
 typedef struct s_manager
@@ -121,7 +119,7 @@ int     initializer(t_global **global_var);
 t_dongle    *initial_dongles(int number_of_coders);
 t_coder     *initial_coders(t_global **global_var);
 t_monitor   *initial_monitor(void);
-
+t_heap      *initial_heap(t_global *gloabl_var);
 // creater functions
 int     create_threads(t_global *global_var);
 int     join_threads(t_global *globals_var);
@@ -148,7 +146,7 @@ void heapify_down(t_heap *heap, int index);
 void heapify_up(t_heap *heap, int index);
 t_coder *pop_heap_at(t_heap *heap, int index);
 void    push_to_heap(t_heap *heap, t_coder *coder);
-
+int     is_empty_heap(t_heap *heap);
 
 // coder functions
 void swap_coders(t_coder **a, t_coder **b);

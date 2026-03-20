@@ -1,5 +1,11 @@
 #include "codexion.h"
 
+
+int		is_empty_heap(t_heap *heap)
+{
+	return (!heap || !heap->size);
+}
+
 int     is_in_heap(t_heap *heap, t_coder *coder)
 {
     int     i;
@@ -12,6 +18,15 @@ int     is_in_heap(t_heap *heap, t_coder *coder)
         i++;
     }
     return 0;
+}
+
+void swap_coders(t_coder **a, t_coder **b)
+{
+    t_coder *tmp;
+
+    tmp = *a;
+    *a = *b;
+    *b = tmp;
 }
 
 void insert_coder_to_heap(t_heap *heap, t_coder *coder)
@@ -100,23 +115,3 @@ void heapify_up(t_heap *heap, int index)
     }
 }
 
-void    push_to_heap(t_heap *heap, t_coder *coder)
-{
-    heap->coders[heap->size] = coder;
-    
-    heapify_up(heap, heap->size);
-    
-    heap->size ++;
-
-
-}
-
-int     is_top_of_heap(t_heap *heap, t_coder *coder)
-{
-    if (!heap || !coder)
-        return (0);
-    if (heap->coders[0] == coder)
-        return 1;
-    return 0;
-
-}

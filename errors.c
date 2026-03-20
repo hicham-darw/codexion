@@ -69,7 +69,6 @@ void    free_manager(t_manager *manager)
     free(manager->dongles);
     free(manager->heap->coders);
     pthread_mutex_destroy(&manager->heap->mutex_heap);
-    pthread_cond_destroy(&manager->heap->cond_heap);
     free(manager->heap);
     memset(manager, 0, sizeof(manager));
 }
