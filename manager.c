@@ -34,16 +34,14 @@ t_manager	*initial_manager(t_global *global)
 	return (manager);
 }
 
-int		is_empty_heap(t_heap *heap, int number_of_coders)
+int		is_empty_heap(t_heap *heap)
 {
 	int		ret_val;
 
-	pthread_mutex_lock(&heap->mutex_heap);
 	if (!heap || !heap->size)
 		ret_val = 1;
 	else
 		ret_val = 0;
-	pthread_mutex_unlock(&heap->mutex_heap);
 	return ret_val;
 }
 
@@ -100,9 +98,14 @@ void *manager_routine(void *arg)
 
 	while (/*!manager->globals->is_finished*/1)
     {
-        while (is_empty_heap(manager->heap, manager->globals->number_of_coders))
-			usleep(500);
 		pthread_mutex_lock(&manager->heap->mutex_heap);
+        if (is_empty_heap(manager->heap))
+		{
+			pthread_mutex_unlock(&manager->heap->mutex_heap);
+			usleep(500);
+			continue;
+		}
+
         i = 0;
         while (i < manager->heap->size)
         {
@@ -110,15 +113,19 @@ void *manager_routine(void *arg)
             coder = manager->heap->coders[i];
 			if (is_dongles_available(coder))
             {
+                coder = pop_heap_at(manager->heap, i); // remove coder from heap
+
 				pthread_mutex_lock(&coder->mutex_coder);
 				coder->can_compile = 1;
 				pthread_cond_signal(&coder->cond_coder);
 				pthread_mutex_unlock(&coder->mutex_coder);
+				pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+				pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
 			}
 			i++;
-		}
-		pthread_mutex_unlock(&manager->heap->mutex_heap);
-		usleep(500);
+			pthread_mutex_unlock(&manager->heap->mutex_heap);
+			// usleep(500);
+   		}
 	}
     return NULL;
 }

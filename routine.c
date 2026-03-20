@@ -65,30 +65,44 @@ void    put_dongles(t_coder *coder)
 void *coder_routine(void *arg)
 {
     t_coder *coder = (t_coder *)arg;
+    
+    pthread_mutex_lock(&coder->mutex_coder);
+    if (!coder->number_of_compilling)
+        coder->start_time = get_time_by_milisecond();
+    pthread_mutex_unlock(&coder->mutex_coder);
 
+    if (!(coder->id % 2))
+        usleep(100);
     while (!coder->globals->is_finished)
     {
-        // locking coder for store time of starting routine
-        pthread_mutex_lock(&coder->mutex_coder);
-        if (!coder->number_of_compilling)
-            coder->start_time = get_time_by_milisecond();
-        pthread_mutex_unlock(&coder->mutex_coder);
-
         // insert_coder_to_heap()
         insert_coder_to_heap(coder->globals->heap, coder);
 
+        // waiting signal from manager
         pthread_mutex_lock(&coder->mutex_coder);
         while (!coder->can_compile)
             pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
         pthread_mutex_unlock(&coder->mutex_coder);
 
+        // start compilling...
         print_log(coder, "is compiling");        
         precise_sleep(coder->globals->time_to_compile);
         
+        if (coder->id % 2)
+        {
+            pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+            pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
+        }
+        else
+        {
+            pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
+            pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+        }
         coder->left_dongle->is_taken = 0;
         coder->right_dongle->is_taken = 0;
+        pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
         pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
-        pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);        
+
 
         // last_compile for FIFO and EDF
         pthread_mutex_lock(&coder->mutex_coder);
