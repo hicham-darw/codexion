@@ -122,6 +122,8 @@ void *manager_routine(void *arg)
 				pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
 				pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
 			}
+			// else
+			// 	break;
 			i++;
 			pthread_mutex_unlock(&manager->heap->mutex_heap);
 			// usleep(500);

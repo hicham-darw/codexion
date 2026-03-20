@@ -89,7 +89,7 @@ typedef struct s_coder
     int is_compiling;
     int is_debugging;
     int is_refactoring;
-    int number_of_compilling;
+    int total_compiling;
 
     int     can_compile;
     time_t last_compile_time;
