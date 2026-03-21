@@ -23,10 +23,9 @@ void	print_log(t_coder *coder, char *msg)
 	pthread_mutex_lock(&coder->globals->mutex_print);
 
 	printf("%ld Coder %d %s\n",
-		get_time_by_milisecond() - coder->globals->start_time,
+		get_time_by_milisecond() - coder->start_time,
 		coder->id,
 		msg
 	);
-
 	pthread_mutex_unlock(&coder->globals->mutex_print);
 }

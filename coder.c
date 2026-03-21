@@ -19,17 +19,27 @@ void release_dongles(t_coder *coder)
     pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
 }
 
+void    get_start_time_of_coders(t_coder *coder)
+{
+    // pthread_mutex_lock(&coder->mutex_coder);
+    coder->start_time = get_time_by_milisecond();
+    // pthread_mutex_unlock(&coder->mutex_coder);
+}
+
 
 void    waiting_to_compile(t_coder *coder)
 {
     pthread_mutex_lock(&coder->mutex_coder);
     while (!coder->can_compile)
         pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
+    coder->can_compile = 0;
     pthread_mutex_unlock(&coder->mutex_coder);
 }
 
 void    start_compiling(t_coder *coder)
 {
+    if (!coder->start_time)
+        get_start_time_of_coders(coder);
     print_log(coder, "is compiling");        
     precise_sleep(coder->globals->time_to_compile);
 }
@@ -53,15 +63,6 @@ void    increment_total_compiling(t_coder *coder)
     pthread_mutex_unlock(&coder->mutex_coder);
 }
 
-void    get_start_time_of_coders(t_coder *coder)
-{
-
-    pthread_mutex_lock(&coder->mutex_coder);
-    if (!coder->total_compiling)
-        coder->start_time = get_time_by_milisecond();
-    pthread_mutex_unlock(&coder->mutex_coder);
-
-}
 
 void    get_last_compile_time(t_coder *coder)
 {
@@ -77,18 +78,25 @@ void *coder_routine(void *arg)
 
     get_start_time_of_coders(coder);
 
-    if (!(coder->id % 2))
-        usleep(500);
+    if ((coder->id % 2))
+        usleep(100);
+    
+    // pthread_mutex_lock(&coder->mutex_coder);
+
+    // pthread_mutex_unlock(&coder->mutex_coder);
+    
     while (1)
-    {
+    {        
+
         insert_coder_to_heap(coder->globals->heap, coder);
 
         waiting_to_compile(coder);
         start_compiling(coder);
 
+        get_last_compile_time(coder);
+
         release_dongles(coder);
 
-        get_last_compile_time(coder);
         increment_total_compiling(coder);
 
         start_debugging(coder);

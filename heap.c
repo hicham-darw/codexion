@@ -3,7 +3,7 @@
 
 int		is_empty_heap(t_heap *heap)
 {
-	return (!heap || !heap->size);
+	return (!heap || heap->size >= heap->capacity);
 }
 
 int     is_in_heap(t_heap *heap, t_coder *coder)
@@ -48,7 +48,6 @@ void insert_coder_to_heap(t_heap *heap, t_coder *coder)
     heapify_up(heap, heap->size);
 
     heap->size++;
-    // pthread_cond_broadcast(&heap->cond_heap);
 
     pthread_mutex_unlock(&heap->mutex_heap);
 }

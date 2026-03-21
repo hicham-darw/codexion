@@ -34,7 +34,10 @@ t_global    *parse_numbers(t_global *valid_input, char **av)
         if (parsed_number < 0 || parsed_number == 0 && i == 0 || parsed_number > INT_MAX)
         {
             free_global_var(valid_input);
-            fprintf(stderr, "invalid args must be greather than 0 and less than or equal 200\n");
+            if (i == 0)
+                fprintf(stderr, "invalid argument 0 < <number_of_coders> <= 200\n");
+            else
+                fprintf(stderr, "invalid argument 0 < argument <= INT_MAX\n");
             return (NULL);
         }
         if (add_parsed_number(&valid_input, parsed_number, i) <= 0)
@@ -56,11 +59,16 @@ char    *parse_schedular(char *arg)
     schedular = ft_strtrim(arg);
     if (!schedular)
         return (NULL);
+
     cmp_1 = ft_strcmp(ft_strtolower(schedular), "fifo");
     cmp_2 = ft_strcmp(ft_strtolower(schedular), "edf");
 
     if (cmp_1 && cmp_2)
+    {
+        free(schedular);
+        schedular = NULL;
         return (NULL);
+    }
     return (schedular);
 }
 
@@ -79,5 +87,11 @@ t_global    *parse_arguments(char **av)
     memset(valid_input, 0, sizeof(t_global));
     valid_input = parse_numbers(valid_input, av);
     valid_input->schedular = parse_schedular(av[7]);
+    if (!valid_input->schedular)
+    {
+        free(valid_input);
+        return (NULL);
+    }
+
     return (valid_input);
 }

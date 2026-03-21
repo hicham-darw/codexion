@@ -9,6 +9,7 @@
 # include <string.h>
 # include <limits.h>
 
+#define USAGE "Usage: ./codexion <number_of_coders> <time_to_burnout> <time_to_compile> <time_to_debug> <time_to_refactor> <number_of_compiles_required> <dongle_cooldown> <schedular>\n"
 
 // dongles
 typedef struct s_dongle
@@ -21,13 +22,6 @@ typedef struct s_dongle
     pthread_mutex_t mutex_dongle;
 }t_dongle;
 
-typedef struct s_req
-{
-    struct s_coder **coder;
-
-    long    *arrival_time;
-    long    *deadline_time;
-}   t_req;
 
 typedef struct s_heap
 {
@@ -75,7 +69,11 @@ typedef struct s_global
 typedef struct s_monitor
 {
     pthread_t   thread;
-    int is_stop;
+
+    struct s_coder **coders;
+
+    struct s_global *globals;
+
 }t_monitor;
 
 typedef struct s_coder
@@ -89,6 +87,7 @@ typedef struct s_coder
     int is_refactoring;
     int total_compiling;
 
+    int stop;
     int     can_compile;
     time_t last_compile_time;
     time_t  start_time;
@@ -118,11 +117,13 @@ int     add_parsed_number(t_global **storage, int number, int index);
 int     initializer(t_global **global_var);
 t_dongle    *initial_dongles(int number_of_coders);
 t_coder     *initial_coders(t_global **global_var);
-t_monitor   *initial_monitor(void);
+t_monitor   *initial_monitor(t_global *global_var);
 t_heap      *initial_heap(t_global *gloabl_var);
-// creater functions
+
+// threads_functions
 int     create_threads(t_global *global_var);
 int     join_threads(t_global *globals_var);
+
 // routine function
 void    *coder_routine(void *args);
 void    *monitor_routine(void *args);
@@ -130,12 +131,14 @@ void    *manager_routine(void *args);
 
 // times function
 time_t  get_time_by_milisecond(void);
+
 // free memory
 void free_data_input(t_global *args);
 void free_global_var(t_global *global_var);
 void    free_coders(t_coder *coder, int number_of_coders);
 void    free_dongles(t_dongle *dongles, int number_of_coders);
-void    free_manager(t_manager * manager);
+void    free_manager(t_manager *manager);
+void    free_monitor(t_monitor *monitor);
 
 //manager functions
 t_manager   *initial_manager(t_global *global);
@@ -147,6 +150,7 @@ void heapify_up(t_heap *heap, int index);
 t_coder *pop_heap_at(t_heap *heap, int index);
 void    push_to_heap(t_heap *heap, t_coder *coder);
 int     is_empty_heap(t_heap *heap);
+void     free_heap(t_heap *heap);
 
 // coder functions
 void swap_coders(t_coder **a, t_coder **b);
@@ -160,3 +164,16 @@ void precise_sleep(long time_ms);
 
 
 #endif
+/*
+
+all inside global_var
+char *schedular (free) schedular before global_var;
+t_dongle *dongles (free) => destroy mutex before freeing dongles each dongle
+t_coder *coders (free) => destroy mutex and cond before freeing coders each_coder
+t_heap *heap  (free) => free coders - destroy mutex
+manager :
+t_manager *manager (free) => before dongles of manager should (free)
+ monitor :
+ t_monitor *monitor (free) => free addr coders &&
+
+*/

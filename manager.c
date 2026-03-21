@@ -10,9 +10,12 @@ t_manager	*initial_manager(t_global *global)
 	manager = (t_manager *)malloc(sizeof(t_manager));
 	if (!manager)
 		return (NULL);
+	memset(manager, 0, sizeof(t_manager));
+
 	manager->dongles = (t_dongle **)malloc(sizeof(t_dongle *) * global->number_of_coders);
 	if (!manager->dongles)
 		return (NULL);
+	memset(manager->dongles, 0, sizeof(t_dongle *) * global->number_of_coders);
 
 	i = 0;
 	while (i < global->number_of_coders)
@@ -20,16 +23,10 @@ t_manager	*initial_manager(t_global *global)
 		manager->dongles[i] = &(global->dongles[i]);
 		i += 1;
 	}
-	manager->heap = malloc(sizeof(t_heap));
-	if (!manager->heap)
-		return (NULL);
-	manager->heap->coders = (t_coder **)malloc(sizeof(t_coder *) * global->number_of_coders);
-	if (!manager->heap->coders)
-		return (NULL);
-	manager->heap->size = 0;
-	manager->heap->capacity = global->number_of_coders;
+
+	manager->heap = global->heap;
 	manager->globals = global;
-	pthread_mutex_init(&manager->heap->mutex_heap, NULL);
+
 	return (manager);
 }
 
@@ -82,7 +79,6 @@ void	pop_all_available_to_compile(t_manager *manager)
 		if (take_dongles(coder))
 			pop_coder_to_compile(manager, coder, i);
 		i++;
-		pthread_mutex_unlock(&manager->heap->mutex_heap);
    	}
 }
 
@@ -98,10 +94,11 @@ void *manager_routine(void *arg)
         if (is_empty_heap(manager->heap))
 		{
 			pthread_mutex_unlock(&manager->heap->mutex_heap);
-			usleep(500);
+			usleep(100);
 			continue;
 		}
 		pop_all_available_to_compile(manager);
+		pthread_mutex_unlock(&manager->heap->mutex_heap);
 	}
-    return NULL;
+    return (NULL);
 }

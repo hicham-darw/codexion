@@ -8,6 +8,7 @@ t_dongle    *initial_dongles(int number_of_coders)
     dongle = malloc(sizeof(t_dongle) * (number_of_coders));
     if (!dongle)
         return (NULL);
+    memset(dongle, 0, sizeof(t_dongle) * (number_of_coders));
     i = 0;
     while (i < number_of_coders)
     {
