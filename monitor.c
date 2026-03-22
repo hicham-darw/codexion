@@ -24,23 +24,24 @@ void    *monitor_routine(void *args)
                 && (monitor->coders[i]->last_compile_time != 0)
             )
             {
-                print_log(monitor->coders[i], "is burned out!");
+                print_log(monitor->coders[i], "is burned out!!!!!");
                 burned_out = 1;
                 pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
                 break;
             }
             pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
+            
+            pthread_mutex_lock(&monitor->globals->mutex_stop);
+            monitor->globals->stop = 1;
+            pthread_mutex_unlock(&monitor->globals->mutex_stop);
             i++;
         }
         if (burned_out)
-            break;
+            return (NULL);
         if (finished_compile == monitor->globals->number_of_coders)
-            break;
+            return (NULL);
+        usleep(500);
     }
-
-    pthread_mutex_lock(&monitor->globals->mutex_stop);
-    monitor->globals->stop = 1;
-    pthread_mutex_unlock(&monitor->globals->mutex_stop);
 
     i = 0;
     while (i < monitor->globals->number_of_coders)

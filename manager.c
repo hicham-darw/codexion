@@ -86,15 +86,31 @@ void *manager_routine(void *arg)
 {
     t_manager *manager;
     int i;
+	t_coder *coder;
 
 	manager = (t_manager *)arg;
 	// usleep(100);
 	// should handle it by arg global changed (easy-peasy lemon squezzy)
-	pthread_mutex_lock(&manager->globals->mutex_stop);
-	while (!manager->globals->stop)
-    {
+	while (1)
+	{
+		pthread_mutex_lock(&manager->globals->mutex_stop);
+		if (manager->globals->stop)
+		{
+			pthread_mutex_unlock(&manager->globals->mutex_stop);
+			pthread_mutex_lock(&manager->heap->mutex_heap);
+			while (!is_empty_heap(manager->heap))
+			{
+				coder = pop_heap_at(manager->heap, 0);
+				pthread_mutex_lock(&coder->mutex_coder);
+				coder->can_compile = 1;
+				pthread_cond_broadcast(&coder->cond_coder);
+				pthread_mutex_unlock(&coder->mutex_coder);
+			}
+			pthread_mutex_unlock(&manager->heap->mutex_heap);
+			return (NULL);
+		}
 		pthread_mutex_unlock(&manager->globals->mutex_stop);
-		// pthread_mutex_lock(&manager->globals->coders[0].st);
+
 		pthread_mutex_lock(&manager->heap->mutex_heap);
         if (is_empty_heap(manager->heap))
 		{
@@ -105,8 +121,7 @@ void *manager_routine(void *arg)
 		
 		pop_all_available_to_compile(manager);
 		pthread_mutex_unlock(&manager->heap->mutex_heap);
-		pthread_mutex_lock(&manager->globals->mutex_stop);
+		usleep(100);
 	}
-	pthread_mutex_unlock(&manager->globals->mutex_stop);
     return (NULL);
 }
