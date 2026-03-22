@@ -88,8 +88,13 @@ void *manager_routine(void *arg)
     int i;
 
 	manager = (t_manager *)arg;
-	while (/*!manager->globals->is_finished*/1)
+	// usleep(100);
+	// should handle it by arg global changed (easy-peasy lemon squezzy)
+	pthread_mutex_lock(&manager->globals->mutex_stop);
+	while (!manager->globals->stop)
     {
+		pthread_mutex_unlock(&manager->globals->mutex_stop);
+		// pthread_mutex_lock(&manager->globals->coders[0].st);
 		pthread_mutex_lock(&manager->heap->mutex_heap);
         if (is_empty_heap(manager->heap))
 		{
@@ -97,8 +102,11 @@ void *manager_routine(void *arg)
 			usleep(100);
 			continue;
 		}
+		
 		pop_all_available_to_compile(manager);
 		pthread_mutex_unlock(&manager->heap->mutex_heap);
+		pthread_mutex_lock(&manager->globals->mutex_stop);
 	}
+	pthread_mutex_unlock(&manager->globals->mutex_stop);
     return (NULL);
 }

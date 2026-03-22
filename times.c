@@ -22,8 +22,8 @@ void	print_log(t_coder *coder, char *msg)
 {
 	pthread_mutex_lock(&coder->globals->mutex_print);
 
-	printf("%ld Coder %d %s\n",
-		get_time_by_milisecond() - coder->start_time,
+	printf("%ld %d %s\n",
+		get_time_by_milisecond() - coder->globals->start_time,
 		coder->id,
 		msg
 	);

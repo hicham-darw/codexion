@@ -32,7 +32,7 @@ int     create_coders_thread(t_global *global_var)
 
 int     create_monitor_thread(t_global *global_var)
 {
-    if (pthread_create(&(global_var->monitor->thread), NULL, monitor_routine, NULL))
+    if (pthread_create(&(global_var->monitor->thread), NULL, monitor_routine, global_var->monitor))
     {
         pthread_mutex_destroy(&global_var->mutex_print);
         pthread_mutex_destroy(&global_var->mutex_time);
@@ -47,11 +47,18 @@ int     create_threads(t_global *global_var)
 {
     if (!create_manager_thread(global_var))
         return (0);
+
+    // pthread_mutex_lock(&global_var->mutex_time);
+    // global_var->start_time = get_time_by_milisecond();
+    // pthread_mutex_unlock(&global_var->mutex_time);
     
     if (!create_coders_thread(global_var))
         return (0);
 
     if (!create_monitor_thread(global_var))
-        return (0);    
+        return (0);
+
+
+    
     return (1);    
 }

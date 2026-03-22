@@ -64,5 +64,6 @@ int     initializer(t_global **global_var)
 
     pthread_mutex_init(&(*global_var)->mutex_print, NULL);
     pthread_mutex_init(&(*global_var)->mutex_time, NULL);
+    pthread_mutex_init(&(*global_var)->mutex_stop, NULL);
     return (1);
 }

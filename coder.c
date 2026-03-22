@@ -38,8 +38,6 @@ void    waiting_to_compile(t_coder *coder)
 
 void    start_compiling(t_coder *coder)
 {
-    if (!coder->start_time)
-        get_start_time_of_coders(coder);
     print_log(coder, "is compiling");        
     precise_sleep(coder->globals->time_to_compile);
 }
@@ -76,31 +74,41 @@ void *coder_routine(void *arg)
 {
     t_coder *coder = (t_coder *)arg;
 
-    get_start_time_of_coders(coder);
-
     if ((coder->id % 2))
-        usleep(100);
-    
-    // pthread_mutex_lock(&coder->mutex_coder);
+        usleep(400);
+    pthread_mutex_lock(&coder->globals->mutex_time);
+    if (!coder->globals->start_time)
+        coder->globals->start_time = get_time_by_milisecond();
+    pthread_mutex_unlock(&coder->globals->mutex_time);
 
-    // pthread_mutex_unlock(&coder->mutex_coder);
-    
+    coder->last_compile_time = coder->globals->start_time;
     while (1)
     {        
-
         insert_coder_to_heap(coder->globals->heap, coder);
-
+        
+        pthread_mutex_lock(&coder->globals->mutex_stop);
+        if (coder->globals->stop)
+        {
+            release_dongles(coder);
+            pthread_mutex_unlock(&coder->globals->mutex_stop);
+            return (NULL);
+        }
+        // printf("stop of globals: %d\n", coder->globals->stop);
+        // printf("coder->id: %d\n", coder->id);
+        pthread_mutex_unlock(&coder->globals->mutex_stop);
+        
         waiting_to_compile(coder);
+        
         start_compiling(coder);
-
         get_last_compile_time(coder);
 
-        release_dongles(coder);
-
+        release_dongles(coder);        
         increment_total_compiling(coder);
-
+        
         start_debugging(coder);
+        
         start_refactoring(coder);
     }
+
     return (NULL);
 }

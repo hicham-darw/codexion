@@ -23,7 +23,8 @@ int main(int ac, char **av)
         return (42);
 
     pthread_mutex_destroy(&global_var->mutex_print);
-    pthread_mutex_destroy(&global_var->mutex_print);
+    pthread_mutex_destroy(&global_var->mutex_time);
+    pthread_mutex_destroy(&global_var->mutex_stop);
     free_global_var(global_var);
     return 0;
 }

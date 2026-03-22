@@ -3,7 +3,7 @@
 
 int		is_empty_heap(t_heap *heap)
 {
-	return (!heap || heap->size >= heap->capacity);
+    return (!heap || !heap->size);
 }
 
 int     is_in_heap(t_heap *heap, t_coder *coder)

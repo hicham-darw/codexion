@@ -54,8 +54,9 @@ typedef struct s_global
     char    *schedular;
 
     time_t  start_time;
-    
-    int     is_finished;
+    int     stop;    
+    pthread_mutex_t mutex_stop;
+
     struct s_coder *coders;
     struct s_dongle *dongles;
     struct s_monitor *monitor;
@@ -79,16 +80,13 @@ typedef struct s_monitor
 typedef struct s_coder
 {
     pthread_t   thread;
+
     int     id;
+    int     total_compiling;
 
-    int both_available;
-    int is_compiling;
-    int is_debugging;
-    int is_refactoring;
-    int total_compiling;
-
-    int stop;
+    int     stop;
     int     can_compile;
+
     time_t last_compile_time;
     time_t  start_time;
 
