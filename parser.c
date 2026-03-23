@@ -24,14 +24,14 @@ int    add_parsed_number(t_global **global, int number, int index)
 
 t_global    *parse_numbers(t_global *valid_input, char **av)
 {
-    int     parsed_number;
+    long long   parsed_number;
     int     i;
 
     i = 0;
     while (av[i] && i < 7)
     {
         parsed_number = ft_atoll(av[i]);
-        if (parsed_number < 0 || parsed_number == 0 && i == 0 || parsed_number > INT_MAX)
+        if (parsed_number < 0 || (parsed_number == 0 && i == 0) || parsed_number > INT_MAX)
         {
             free_global_var(valid_input);
             if (i == 0)
@@ -40,7 +40,7 @@ t_global    *parse_numbers(t_global *valid_input, char **av)
                 fprintf(stderr, "invalid argument 0 < argument <= INT_MAX\n");
             return (NULL);
         }
-        if (add_parsed_number(&valid_input, parsed_number, i) <= 0)
+        if (add_parsed_number(&valid_input, (int)parsed_number, i) <= 0)
         {
             free_global_var(valid_input);
             return (NULL);
@@ -75,9 +75,7 @@ char    *parse_schedular(char *arg)
 
 t_global    *parse_arguments(char **av)
 {
-    long long     parsed_number;
     t_global     *valid_input;
-    int     i;
 
     if (!av || !*av)
         return (NULL);
@@ -86,10 +84,12 @@ t_global    *parse_arguments(char **av)
         return (NULL);
     memset(valid_input, 0, sizeof(t_global));
     valid_input = parse_numbers(valid_input, av);
+    if (!valid_input)
+        return (NULL);
     valid_input->schedular = parse_schedular(av[7]);
     if (!valid_input->schedular)
     {
-        free(valid_input);
+        free_global_var(valid_input);
         return (NULL);
     }
 

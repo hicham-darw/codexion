@@ -1,12 +1,24 @@
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -fsanitize=thread
-SRC_FILES = *.c
-OBJ_FILES = *.o
+CFLAGS = -Wall -Wextra -Werror
+LDFLAGS = -pthread
+NAME = codexion
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
 
+all: $(NAME)
 
-run:
-	cc *.c -pthread
-	./a.out 3 5000 5000 5000 5000 5000 5000 fifo
+$(NAME): $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) $(LDFLAGS) -o $(NAME)
+
+run: $(NAME)
+	./$(NAME) 3 5000 5000 5000 5000 5000 5000 fifo
 
 clean:
-	rm -rf codexion a.out
+	rm -f $(OBJ)
+
+fclean: clean
+	rm -f $(NAME) a.out codexion_strict
+
+re: fclean all
+
+.PHONY: all run clean fclean re

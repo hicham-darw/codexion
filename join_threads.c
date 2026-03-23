@@ -6,6 +6,7 @@ int    join_manager(t_global *global_var)
     {
         pthread_mutex_destroy(&global_var->mutex_print);
         pthread_mutex_destroy(&global_var->mutex_time);
+        pthread_mutex_destroy(&global_var->mutex_stop);
         free_global_var(global_var);
         return (0);
     }
@@ -23,6 +24,7 @@ int     join_coders(t_global *global_var)
         {
             pthread_mutex_destroy(&global_var->mutex_print);
             pthread_mutex_destroy(&global_var->mutex_time);
+            pthread_mutex_destroy(&global_var->mutex_stop);
             free_global_var(global_var);
             return (0);
         }
@@ -36,6 +38,7 @@ int     join_monitor(t_global *global_var)
     {
         pthread_mutex_destroy(&global_var->mutex_print);
         pthread_mutex_destroy(&global_var->mutex_time);
+        pthread_mutex_destroy(&global_var->mutex_stop);
         free_global_var(global_var);
         return (0);
     }

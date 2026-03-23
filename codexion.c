@@ -3,8 +3,6 @@
 int main(int ac, char **av)
 {
     t_global *global_var;
-    t_dongle *dongle;
-    int     i;
 
     if (ac != 9)
     {
@@ -19,7 +17,7 @@ int main(int ac, char **av)
         !initializer(&global_var)
         || !create_threads(global_var)
         || !join_threads(global_var)
-    )        
+    )
         return (42);
 
     pthread_mutex_destroy(&global_var->mutex_print);

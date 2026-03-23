@@ -3,6 +3,13 @@
 
 void release_dongles(t_coder *coder)
 {
+    if (coder->left_dongle == coder->right_dongle)
+    {
+        pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
+        coder->left_dongle->is_taken = 0;
+        pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
+        return ;
+    }
     if (coder->id % 2)
     {
         pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
@@ -31,7 +38,17 @@ void    waiting_to_compile(t_coder *coder)
 {
     pthread_mutex_lock(&coder->mutex_coder);
     while (!coder->can_compile)
+    {
+        pthread_mutex_lock(&coder->globals->mutex_stop);
+        if (coder->globals->stop)
+        {
+            pthread_mutex_unlock(&coder->globals->mutex_stop);
+            pthread_mutex_unlock(&coder->mutex_coder);
+            return ;
+        }
+        pthread_mutex_unlock(&coder->globals->mutex_stop);
         pthread_cond_wait(&coder->cond_coder, &coder->mutex_coder);
+    }
     coder->can_compile = 0;
     pthread_mutex_unlock(&coder->mutex_coder);
 }
@@ -89,7 +106,6 @@ void *coder_routine(void *arg)
         pthread_mutex_lock(&coder->globals->mutex_stop);
         if (coder->globals->stop)
         {
-            release_dongles(coder);
             pthread_mutex_unlock(&coder->globals->mutex_stop);
             return (NULL);
         }
@@ -98,6 +114,14 @@ void *coder_routine(void *arg)
         pthread_mutex_unlock(&coder->globals->mutex_stop);
         
         waiting_to_compile(coder);
+
+        pthread_mutex_lock(&coder->globals->mutex_stop);
+        if (coder->globals->stop)
+        {
+            pthread_mutex_unlock(&coder->globals->mutex_stop);
+            return (NULL);
+        }
+        pthread_mutex_unlock(&coder->globals->mutex_stop);
         
         start_compiling(coder);
         get_last_compile_time(coder);

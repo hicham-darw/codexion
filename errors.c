@@ -2,8 +2,6 @@
 
 void free_global_var(t_global *global_var)
 {
-    t_global tmp;
-
     if (!global_var)
         return;
     if (global_var->schedular)
