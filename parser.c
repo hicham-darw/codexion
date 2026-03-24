@@ -1,7 +1,7 @@
 #include "codexion.h"
 
 
-int    add_parsed_number(t_global **global, int number, int index)
+static int    add_parsed_number(t_global **global, int number, int index)
 {
     if (!global)
         return (0);
@@ -22,7 +22,7 @@ int    add_parsed_number(t_global **global, int number, int index)
     return 1;
 }
 
-t_global    *parse_numbers(t_global *valid_input, char **av)
+static t_global    *parse_numbers(t_global *valid_input, char **av)
 {
     long long   parsed_number;
     int     i;
@@ -50,7 +50,7 @@ t_global    *parse_numbers(t_global *valid_input, char **av)
     return (valid_input);
 }
 
-char    *parse_schedular(char *arg)
+static char    *parse_schedular(char *arg)
 {
     char    *schedular;
     int     cmp_1;

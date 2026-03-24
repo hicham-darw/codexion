@@ -33,39 +33,6 @@ t_manager	*initial_manager(t_global *global)
 	return (manager);
 }
 
-int	take_dongles(t_coder * coder)
-{
-	int		ret_val;
-
-	if (coder->left_dongle == coder->right_dongle)
-	{
-		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
-		pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
-		return (0);
-	}
-
-	if (coder->id % 2)
-	{
-		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
-		pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
-	}
-	else
-	{
-		pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
-		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
-	}
-	if (!coder->left_dongle->is_taken && !coder->right_dongle->is_taken)
-	{
-		coder->left_dongle->is_taken = 1;
-		coder->right_dongle->is_taken = 1;
-		return (1);
-	}
-	ret_val = 0;
-	pthread_mutex_unlock(&coder->left_dongle->mutex_dongle);
-	pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);
-	return ret_val;
-}
-
 void	pop_coder_to_compile(t_manager *manager, t_coder *coder, int index_in_heap)
 {
 	coder = pop_heap_at(manager->heap, index_in_heap); // remove coder from heap

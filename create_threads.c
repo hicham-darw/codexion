@@ -51,9 +51,9 @@ int     create_threads(t_global *global_var)
     if (!create_manager_thread(global_var))
         return (0);
 
-    // pthread_mutex_lock(&global_var->mutex_time);
-    // global_var->start_time = get_time_by_milisecond();
-    // pthread_mutex_unlock(&global_var->mutex_time);
+    pthread_mutex_lock(&global_var->mutex_time);
+    global_var->start_time = get_time_by_milisecond();
+    pthread_mutex_unlock(&global_var->mutex_time);
     
     if (!create_coders_thread(global_var))
         return (0);

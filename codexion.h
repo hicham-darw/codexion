@@ -109,7 +109,6 @@ int     valid_schedular(char *schedular);
 
 // parser functions
 t_global    *parse_arguments(char **argv);
-int     add_parsed_number(t_global **storage, int number, int index);
 
 // initialize functions
 int     initializer(t_global **global_var);
@@ -155,6 +154,8 @@ void swap_coders(t_coder **a, t_coder **b);
 
 //dongles functions
 int    is_dongles_available(t_coder *coder);
+void    release_dongles(t_coder *coder);
+int    take_dongles(t_coder *coder);
 
 // print_log
 void	print_log(t_coder *coder, char *msg);

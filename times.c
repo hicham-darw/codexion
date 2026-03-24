@@ -15,7 +15,7 @@ void precise_sleep(long time_ms)
     start = get_time_by_milisecond();
 
     while (get_time_by_milisecond() - start < time_ms)
-        usleep(500);
+        usleep(200);
 }
 
 void	print_log(t_coder *coder, char *msg)
