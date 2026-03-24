@@ -48,6 +48,9 @@ void    *monitor_routine(void *args)
             if (monitor->globals->number_of_compiles_required == monitor->coders[i]->total_compiling)
                 finished_compile += 1;
             if (
+                monitor->coders[i]->started_compiling
+                && !monitor->coders[i]->is_compiling
+                &&
                 get_time_by_milisecond() - monitor->coders[i]->last_compile_time > monitor->globals->time_to_burnout
                 && (monitor->coders[i]->last_compile_time != 0)
             )

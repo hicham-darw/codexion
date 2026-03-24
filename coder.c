@@ -50,8 +50,17 @@ void    waiting_to_compile(t_coder *coder)
 
 void    start_compiling(t_coder *coder)
 {
+    pthread_mutex_lock(&coder->mutex_coder);
+    coder->started_compiling = 1;
+    coder->is_compiling = 1;
+    pthread_mutex_unlock(&coder->mutex_coder);
+
     print_log(coder, "is compiling");        
     precise_sleep(coder->globals->time_to_compile);
+
+    pthread_mutex_lock(&coder->mutex_coder);
+    coder->is_compiling = 0;
+    pthread_mutex_unlock(&coder->mutex_coder);
 }
 
 void    start_debugging(t_coder *coder)
@@ -111,9 +120,11 @@ void *coder_routine(void *arg)
 
     if ((coder->id % 2))
         usleep(200);
+
     pthread_mutex_lock(&coder->globals->mutex_time);
     coder->last_compile_time = coder->globals->start_time;
     pthread_mutex_unlock(&coder->globals->mutex_time);
+    
     while (1)
     {        
         insert_coder_to_heap(coder->globals->heap, coder);
