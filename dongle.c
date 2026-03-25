@@ -24,6 +24,7 @@ t_dongle    *initial_dongles(int number_of_coders)
 int	take_dongles(t_coder * coder)
 {
 	int		ret_val;
+    time_t	now;
 
 	if (coder->left_dongle == coder->right_dongle)
 	{
@@ -42,7 +43,11 @@ int	take_dongles(t_coder * coder)
 		pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
 		pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
 	}
-	if (!coder->left_dongle->is_taken && !coder->right_dongle->is_taken)
+    now = get_time_by_milisecond();
+	if (!coder->left_dongle->is_taken &&
+        !coder->right_dongle->is_taken &&
+        coder->left_dongle->cooldown_time <= now &&
+        coder->right_dongle->cooldown_time <= now)
 	{
 		coder->left_dongle->is_taken = 1;
 		coder->right_dongle->is_taken = 1;
@@ -73,6 +78,8 @@ void release_dongles(t_coder *coder)
         pthread_mutex_lock(&coder->right_dongle->mutex_dongle);
         pthread_mutex_lock(&coder->left_dongle->mutex_dongle);
     }
+    coder->left_dongle->cooldown_time = get_time_by_milisecond() + coder->globals->dongle_cooldown;
+    coder->right_dongle->cooldown_time = get_time_by_milisecond() + coder->globals->dongle_cooldown;
     coder->left_dongle->is_taken = 0;
     coder->right_dongle->is_taken = 0;
     pthread_mutex_unlock(&coder->right_dongle->mutex_dongle);

@@ -126,12 +126,12 @@ void *coder_routine(void *arg)
     pthread_mutex_unlock(&coder->globals->mutex_time);
     
     while (1)
-    {        
+    {
         insert_coder_to_heap(coder->globals->heap, coder);
-        
+
         if (should_stop(coder))
             break;
-        
+
         waiting_to_compile(coder);
 
         if (should_stop(coder))
@@ -139,17 +139,17 @@ void *coder_routine(void *arg)
 
         start_compiling(coder);
         get_last_compile_time(coder);
-        release_dongles(coder);        
+        release_dongles(coder);
         increment_total_compiling(coder);
 
         if (should_stop(coder))
             break;
-        
+
         start_debugging(coder);
-        
+
         if (should_stop(coder))
             break;
-        
+
         start_refactoring(coder);
     }
 
