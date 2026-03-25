@@ -45,6 +45,15 @@ void    *monitor_routine(void *args)
         while (i < monitor->globals->number_of_coders)
         {
             pthread_mutex_lock(&monitor->coders[i]->mutex_coder);
+            if (monitor->globals->number_of_coders == 1 &&
+                monitor->coders[i]->last_compile_time &&
+                get_time_by_milisecond() - monitor->coders[i]->last_compile_time > monitor->globals->time_to_burnout
+            )
+            {
+                burned_out = 1;
+                pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
+                break;
+            }
             if (monitor->globals->number_of_compiles_required == monitor->coders[i]->total_compiling)
                 finished_compile += 1;
             if (
@@ -55,6 +64,7 @@ void    *monitor_routine(void *args)
                 && (monitor->coders[i]->last_compile_time != 0)
             )
             {
+
                 burned_out = 1;
                 pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
                 break;
