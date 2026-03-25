@@ -17,7 +17,7 @@ clean:
 	rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME) a.out codexion_strict
+	rm -f $(NAME) codexion
 
 re: fclean all
 
