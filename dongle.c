@@ -14,7 +14,11 @@ t_dongle    *initial_dongles(int number_of_coders)
     {
         dongle[i].id = i + 1;
         dongle[i].is_taken = 0;
-        pthread_mutex_init(&dongle[i].mutex_dongle, NULL);
+        if(pthread_mutex_init(&dongle[i].mutex_dongle, NULL))
+        {
+            destroy_mutexes_of_dongles_at(dongle, i);
+            return (NULL);
+        }
         i += 1;
     }
     return (dongle);

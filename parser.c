@@ -42,7 +42,7 @@ static t_global    *parse_numbers(t_global *valid_input, char **av)
         }
         if (add_parsed_number(&valid_input, (int)parsed_number, i) <= 0)
         {
-            free_global_var(valid_input);
+            free(valid_input);
             return (NULL);
         }
         i += 1;
@@ -69,7 +69,7 @@ static char    *parse_schedular(char *arg)
         schedular = NULL;
         return (NULL);
     }
-    return (schedular);
+    return (ft_strtolower(schedular));
 }
 
 
@@ -89,9 +89,8 @@ t_global    *parse_arguments(char **av)
     valid_input->schedular = parse_schedular(av[7]);
     if (!valid_input->schedular)
     {
-        free_global_var(valid_input);
+        free(valid_input);
         return (NULL);
     }
-
     return (valid_input);
 }

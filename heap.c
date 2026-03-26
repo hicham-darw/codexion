@@ -29,6 +29,42 @@ void swap_coders(t_coder **a, t_coder **b)
     *b = tmp;
 }
 
+t_heap  *initial_heap(t_global **global_var)
+{
+    t_heap  *heap;
+    int     i;
+
+    if (!(*global_var))
+        return (NULL);
+    heap = malloc(sizeof(t_heap));
+    if (!heap)
+        return (0);
+    heap->coders = (t_coder **)malloc(sizeof(t_coder *) * (*global_var)->number_of_coders);
+    if (!heap->coders)
+    {
+        free(heap);
+        return (0);
+    }
+
+    i = 0;
+    while (i < (*global_var)->number_of_coders)
+    {
+        heap->coders[i] = &(*global_var)->coders[i];
+        i += 1;
+    }
+
+    heap->size = 0;
+    heap->capacity = (*global_var)->number_of_coders;
+    if (pthread_mutex_init(&heap->mutex_heap, NULL))
+    {
+        free(heap->coders);
+        free(heap);
+        return (NULL);
+    }
+    return (heap);
+}
+
+
 void insert_coder_to_heap(t_heap *heap, t_coder *coder)
 {
     pthread_mutex_lock(&heap->mutex_heap);

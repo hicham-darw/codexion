@@ -1,3 +1,4 @@
 {
-    "files.defaultLanguage": "english"
+    "files.defaultLanguage": "english",
+    "C_Cpp.errorSquiggles": "disabled"
 }

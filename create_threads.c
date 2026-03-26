@@ -61,7 +61,5 @@ int     create_threads(t_global *global_var)
     if (!create_monitor_thread(global_var))
         return (0);
 
-
-    
     return (1);    
 }

@@ -54,5 +54,5 @@ int     join_threads(t_global *global_var)
     if (!join_monitor(global_var))
         return (0);
 
-    return 1;
+    return (1);
 }

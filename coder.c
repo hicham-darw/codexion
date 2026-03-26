@@ -22,8 +22,18 @@ t_coder	*initial_coders(t_global **global_var)
 		else
 			coders[i].right_dongle = &((*global_var)->dongles[0]);
 		coders[i].globals = (*global_var);
-		pthread_mutex_init(&coders[i].mutex_coder, NULL);
-		pthread_cond_init(&coders[i].cond_coder, NULL);
+        if (pthread_mutex_init(&coders[i].mutex_coder, NULL))
+        {
+            destroy_mutexes_of_coders_at(coders, i);
+            destroy_conds_of_coders_at(coders, i - 1);
+            return (NULL);      
+        }
+        if (pthread_cond_init(&coders[i].cond_coder, NULL))
+        {
+            destroy_mutexes_of_coders_at(coders, i);
+            destroy_conds_of_coders_at(coders, i);
+            return (NULL);
+        }
 		i ++;
 	}
 	return (coders);
