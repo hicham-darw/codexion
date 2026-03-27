@@ -85,11 +85,9 @@ typedef struct s_coder
 
     int     stop;
     int     can_compile;
-    int     started_compiling;
     int     is_compiling;
 
     time_t last_compile_time;
-    time_t  start_time;
 
     t_dongle    *left_dongle;
     t_dongle    *right_dongle;
@@ -153,6 +151,7 @@ void     free_heap(t_heap *heap);
 
 // coder functions
 void swap_coders(t_coder **a, t_coder **b);
+int		burnout_coder(t_coder *coder);
 
 //dongles functions
 int    is_dongles_available(t_coder *coder);

@@ -16,12 +16,12 @@ t_coder	*initial_coders(t_global **global_var)
 	{
 		coders[i].id = i + 1;
 		coders[i].left_dongle = &((*global_var)->dongles[i]);
-		coders[i].start_time = 0;
 		if (i < (*global_var)->number_of_coders - 1)
 			coders[i].right_dongle = &((*global_var)->dongles[i + 1]);
 		else
 			coders[i].right_dongle = &((*global_var)->dongles[0]);
 		coders[i].globals = (*global_var);
+        // init_mutex_and_cond_of_coder()
         if (pthread_mutex_init(&coders[i].mutex_coder, NULL))
         {
             destroy_mutexes_of_coders_at(coders, i);
@@ -61,7 +61,7 @@ void    waiting_to_compile(t_coder *coder)
 void    start_compiling(t_coder *coder)
 {
     pthread_mutex_lock(&coder->mutex_coder);
-    coder->started_compiling = 1;
+    // coder->started_compiling = 1;
     coder->is_compiling = 1;
     pthread_mutex_unlock(&coder->mutex_coder);
 

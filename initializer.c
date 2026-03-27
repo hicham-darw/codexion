@@ -15,6 +15,7 @@ int initial_dongles_and_coders_and_heap(t_global **global_var)
         free_global_var((*global_var));
         return (0);
     }
+
     (*global_var)->heap = initial_heap(global_var); //heap
     if (!(*global_var)->heap)
     {

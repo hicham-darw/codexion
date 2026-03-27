@@ -8,6 +8,16 @@ time_t	get_time_by_milisecond(void)
 	return ((t_val.tv_sec * 1000) + (t_val.tv_usec / 1000));
 }
 
+int		burnout_coder(t_coder *coder)
+{
+	time_t	now;
+
+	now = get_time_by_milisecond();
+	if (now - coder->last_compile_time > coder->globals->time_to_burnout)
+		return (1);
+	return (0);
+}
+
 void precise_sleep(long time_ms)
 {
     long start;
