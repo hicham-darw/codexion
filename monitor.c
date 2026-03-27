@@ -48,9 +48,6 @@ void    check_each_coder(t_coder *coder, int *finish_compile, int *burnout)
     }
     if (coder->globals->number_of_compiles_required == coder->total_compiling)
         finish_compile += 1;
-    // printf("coder->is_compiling: %d\n", coder->is_compiling);
-    // printf("burnout_coder: %d\n", burnout_coder(coder));
-    // printf("coder->last_compile: %ld\n", coder->last_compile_time);
     if (
         !coder->is_compiling
         && burnout_coder(coder)
@@ -62,6 +59,18 @@ void    check_each_coder(t_coder *coder, int *finish_compile, int *burnout)
         return;
     }
     pthread_mutex_unlock(&coder->mutex_coder);
+}
+
+static int    should_stop(t_monitor *monitor, int i, int burnout, int n_compiles)
+{
+    if (burnout)
+    {
+        print_log(monitor->coders[i], "is burned out!!!!!");
+        return (1);
+    }
+    if (n_compiles == monitor->globals->number_of_coders)
+        return (1);
+    return (0);
 }
 
 void    *monitor_routine(void *args)
@@ -84,16 +93,10 @@ void    *monitor_routine(void *args)
                 break;
             i++;
         }
-        if (burned_out)
-        {
-            print_log(monitor->coders[i], "is burned out!!!!!");
-            break;
-        }
-        if (finished_compile == monitor->globals->number_of_coders)
+        if (should_stop(monitor, i, burned_out, finished_compile))
             break;
         usleep(500);
     }
-
     change_stop_var(monitor);
     return (NULL);
 }
