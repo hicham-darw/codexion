@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   create_threads.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/27 22:24:07 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/27 23:12:48 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 int     create_manager_thread(t_global *global_var)
@@ -63,3 +75,5 @@ int     create_threads(t_global *global_var)
 
     return (1);    
 }
+
+

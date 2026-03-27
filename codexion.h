@@ -104,7 +104,7 @@ char    *ft_strdup(const char *str);
 int	ft_strcmp(const char *s1, const char *s2);
 char    *ft_strtrim(const char *str);
 char    *ft_strtolower(char *str);
-int     valid_schedular(char *schedular);
+void    *ft_memalloc(size_t size);
 
 // parser functions
 t_global    *parse_arguments(char **argv);
@@ -154,34 +154,12 @@ void swap_coders(t_coder **a, t_coder **b);
 int		burnout_coder(t_coder *coder);
 
 //dongles functions
-int    is_dongles_available(t_coder *coder);
 void    release_dongles(t_coder *coder);
 int    take_dongles(t_coder *coder);
 
 // print_log
 void	print_log(t_coder *coder, char *msg);
-void precise_sleep(long time_ms);
+void    precise_sleep(long time_ms);
 
 
 #endif
-
-
-
-
-/*
-global_var has schedular should free
-*/
-
-/*
-
-all inside global_var
-char *schedular (free) schedular before global_var;
-t_dongle *dongles (free) => destroy mutex before freeing dongles each dongle
-t_coder *coders (free) => destroy mutex and cond before freeing coders each_coder
-t_heap *heap  (free) => free coders - destroy mutex
-manager :
-t_manager *manager (free) => before dongles of manager should (free)
- monitor :
- t_monitor *monitor (free) => free addr coders &&
-
-*/

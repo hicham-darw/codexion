@@ -27,7 +27,6 @@ int initial_dongles_and_coders_and_heap(t_global **global_var)
 
 int     initializer(t_global **global_var)
 {
-
     if (!initial_dongles_and_coders_and_heap(global_var))
         return (0);
 
@@ -44,6 +43,7 @@ int     initializer(t_global **global_var)
         free_global_var(*global_var);
         return (0);
     }
+
     pthread_mutex_init(&(*global_var)->mutex_print, NULL);
     pthread_mutex_init(&(*global_var)->mutex_time, NULL);
     pthread_mutex_init(&(*global_var)->mutex_stop, NULL);

@@ -42,6 +42,19 @@ int     real_number(const char *str)
     return (0);
 }
 
+void    *ft_memalloc(size_t size)
+{
+    void    *ptr;
+
+    if (size <= 0)
+        return (NULL);
+    ptr = malloc(size);
+    if (!ptr)
+        return (NULL);
+    memset(ptr, 0, size);    
+    return (ptr);
+}
+
 long long     ft_atoll(const char *str)
 {
     long long     res;

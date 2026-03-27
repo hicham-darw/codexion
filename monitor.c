@@ -6,11 +6,10 @@ t_monitor   *initial_monitor(t_global *global_var)
     t_monitor *monitor;
     int     i;
 
-    monitor = malloc(sizeof(t_monitor));
+    monitor = ft_memalloc(sizeof(t_monitor));
     if (!monitor)
         return (NULL);
-    memset(monitor, 0, sizeof(t_monitor));
-    monitor->coders = (t_coder **)malloc(sizeof(t_coder *) * global_var->number_of_coders);
+    monitor->coders = (t_coder **)ft_memalloc(sizeof(t_coder *) * global_var->number_of_coders);
     if (!monitor->coders)
     {
         free(monitor);
@@ -27,6 +26,43 @@ t_monitor   *initial_monitor(t_global *global_var)
     return (monitor);
 }
 
+static void    change_stop_var(t_monitor *monitor)
+{
+    pthread_mutex_lock(&monitor->globals->mutex_stop);
+    monitor->globals->stop = 1;
+    pthread_mutex_unlock(&monitor->globals->mutex_stop);
+}
+
+void    check_each_coder(t_coder *coder, int *finish_compile, int *burnout)
+{
+    pthread_mutex_lock(&coder->mutex_coder);
+    if (
+        coder->globals->number_of_coders == 1
+        && coder->last_compile_time
+        && burnout_coder(coder)
+    )
+    {
+        *burnout = 1;
+        pthread_mutex_unlock(&coder->mutex_coder);
+        return;
+    }
+    if (coder->globals->number_of_compiles_required == coder->total_compiling)
+        finish_compile += 1;
+    // printf("coder->is_compiling: %d\n", coder->is_compiling);
+    // printf("burnout_coder: %d\n", burnout_coder(coder));
+    // printf("coder->last_compile: %ld\n", coder->last_compile_time);
+    if (
+        !coder->is_compiling
+        && burnout_coder(coder)
+        && (coder->last_compile_time != 0)
+    )
+    {  
+        *burnout = 1;
+        pthread_mutex_unlock(&coder->mutex_coder);
+        return;
+    }
+    pthread_mutex_unlock(&coder->mutex_coder);
+}
 
 void    *monitor_routine(void *args)
 {
@@ -36,7 +72,6 @@ void    *monitor_routine(void *args)
     int     burned_out;
 
     monitor = (t_monitor *)args;
-
     burned_out = 0;
     while (1)
     {
@@ -44,29 +79,9 @@ void    *monitor_routine(void *args)
         finished_compile = 0;
         while (i < monitor->globals->number_of_coders)
         {
-            pthread_mutex_lock(&monitor->coders[i]->mutex_coder);
-            if (monitor->globals->number_of_coders == 1 &&
-                monitor->coders[i]->last_compile_time &&
-                burnout_coder(monitor->coders[i])
-            )
-            {
-                burned_out = 1;
-                pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
+            check_each_coder(monitor->coders[i], &finished_compile, &burned_out);
+            if (burned_out)
                 break;
-            }
-            if (monitor->globals->number_of_compiles_required == monitor->coders[i]->total_compiling)
-                finished_compile += 1;
-            if (
-                !monitor->coders[i]->is_compiling
-                && burnout_coder(monitor->coders[i])
-                && (monitor->coders[i]->last_compile_time != 0)
-            )
-            {  
-                burned_out = 1;
-                pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
-                break;
-            }
-            pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
             i++;
         }
         if (burned_out)
@@ -79,18 +94,6 @@ void    *monitor_routine(void *args)
         usleep(500);
     }
 
-    pthread_mutex_lock(&monitor->globals->mutex_stop);
-    monitor->globals->stop = 1;
-    pthread_mutex_unlock(&monitor->globals->mutex_stop);
-    /* should check here !!!*/
-    i = 0;
-    while (i < monitor->globals->number_of_coders)
-    {
-        pthread_mutex_lock(&monitor->coders[i]->mutex_coder);
-        pthread_cond_broadcast(&monitor->coders[i]->cond_coder);
-        pthread_mutex_unlock(&monitor->coders[i]->mutex_coder);
-        i++;
-    }
-
+    change_stop_var(monitor);
     return (NULL);
 }

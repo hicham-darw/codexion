@@ -78,13 +78,9 @@ void insert_coder_to_heap(t_heap *heap, t_coder *coder)
         pthread_mutex_unlock(&heap->mutex_heap);
         return ;
     }
-
     heap->coders[heap->size] = coder;
-
     heapify_up(heap, heap->size);
-
     heap->size++;
-
     pthread_mutex_unlock(&heap->mutex_heap);
 }
 
