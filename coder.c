@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   coder.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/27 20:54:35 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 01:07:43 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/28 04:49:53 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include	"codexion.h"
+#include "codexion.h"
 
 static int	should_stop(t_coder *coder)
 {
@@ -137,7 +137,7 @@ static void	increment_total_compiling(t_coder *coder)
 static void	get_last_compile_time(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->mutex_coder);
-	coder->last_compile_time = get_time_by_milisecond();
+	coder->last_compile = get_time_by_milisecond();
 	pthread_mutex_unlock(&coder->mutex_coder);
 }
 

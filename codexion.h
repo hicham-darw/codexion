@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 01:59:31 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/28 04:49:27 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 # define USAGE1 "Usage: ./codexion <number_of_coders> <time_to_burnout> "
 # define USAGE2 "<time_to_compile> <time_to_debug> <time_to_refactor> "
 # define USAGE3 "<number_of_compiles_required> <dongle_cooldown> <schedular>\n"
+# define ERR_NUMBER_OF_CODERS "invalid argument 0 < <number_of_coders> <= 200\n"
+# define ERR_INVALID_ARG "invalid argument 0 < argument <= INT_MAX\n"
 
 // dongles
 typedef struct s_dongle
@@ -87,7 +89,7 @@ typedef struct s_coder
 	int					stop;
 	int					can_compile;
 	int					is_compiling;
-	time_t				last_compile_time;
+	time_t				last_compile;
 	t_dongle			*left_dongle;
 	t_dongle			*right_dongle;
 	t_global			*globals;

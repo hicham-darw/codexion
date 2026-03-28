@@ -8,34 +8,32 @@ time_t	get_time_by_milisecond(void)
 	return ((t_val.tv_sec * 1000) + (t_val.tv_usec / 1000));
 }
 
-int		burnout_coder(t_coder *coder)
+int	burnout_coder(t_coder *coder)
 {
 	time_t	now;
 
 	now = get_time_by_milisecond();
-	if (now - coder->last_compile_time > coder->globals->time_to_burnout)
+	if (now - coder->last_compile > coder->globals->time_to_burnout)
 		return (1);
 	return (0);
 }
 
-void precise_sleep(long time_ms)
+void	precise_sleep(long time_ms)
 {
-    long start;
+	long	start;
 
-    start = get_time_by_milisecond();
-
-    while (get_time_by_milisecond() - start < time_ms)
-        usleep(200);
+	start = get_time_by_milisecond();
+	while (get_time_by_milisecond() - start < time_ms)
+		usleep(200);
 }
 
 void	print_log(t_coder *coder, char *msg)
 {
 	pthread_mutex_lock(&coder->globals->mutex_print);
-
-	printf("%ld %d %s\n",
+	printf(
+		"%ld %d %s\n",
 		get_time_by_milisecond() - coder->globals->start_time,
 		coder->id,
-		msg
-	);
+		msg);
 	pthread_mutex_unlock(&coder->globals->mutex_print);
 }

@@ -1,111 +1,100 @@
 #include "codexion.h"
 
-
-void    destroy_mutexes_of_dongles_at(t_dongle *dongles, int i)
+void	destroy_mutexes_of_dongles_at(t_dongle *dongles, int i)
 {
-    while (--i >= 0)
-        pthread_mutex_destroy(&dongles[i].mutex_dongle);
-    free(dongles);
-    return;
+	while (--i >= 0)
+		pthread_mutex_destroy(&dongles[i].mutex_dongle);
+	free(dongles);
+	return ;
 }
 
-void    destroy_mutexes_of_coders_at(t_coder *coders, int i)
+void	destroy_mutexes_of_coders_at(t_coder *coders, int i)
 {
-    while (--i)
-        pthread_mutex_destroy(&coders[i].mutex_coder);
+	while (--i)
+		pthread_mutex_destroy(&coders[i].mutex_coder);
 }
 
-void    destroy_conds_of_coders_at(t_coder *coders, int i)
+void	destroy_conds_of_coders_at(t_coder *coders, int i)
 {
-    while (--i)
-        pthread_cond_destroy(&coders[i].cond_coder);
-    free(coders);
+	while (--i)
+		pthread_cond_destroy(&coders[i].cond_coder);
+	free(coders);
 }
 
-void free_global_var(t_global *global_var)
+void	free_global_var(t_global *global_var)
 {
-    if (!global_var)
-        return;
-    if (global_var->schedular)
-    {
-        free(global_var->schedular);
-        global_var->schedular = NULL;
-    }
-    free_coders(global_var->coders, global_var->number_of_coders);
-
-    free_dongles(global_var->dongles, global_var->number_of_coders);
-
-    free_heap(global_var->heap);
-
-    free_manager(global_var->manager);
-    
-    free_monitor(global_var->monitor);
-
-    free(global_var);
+	if (!global_var)
+		return ;
+	if (global_var->schedular)
+	{
+		free(global_var->schedular);
+		global_var->schedular = NULL;
+	}
+	free_coders(global_var->coders, global_var->number_of_coders);
+	free_dongles(global_var->dongles, global_var->number_of_coders);
+	free_heap(global_var->heap);
+	free_manager(global_var->manager);
+	free_monitor(global_var->monitor);
+	free(global_var);
 }
 
-void    free_dongles(t_dongle *dongles, int number_of_coders)
+void	free_dongles(t_dongle *dongles, int number_of_coders)
 {
-    int     i;
+	int	i;
 
-    if (!dongles || !number_of_coders)
-        return ;
-    i = 0;
-    while (i < number_of_coders)
-        pthread_mutex_destroy(&dongles[i++].mutex_dongle);
-    free(dongles);
-    dongles = NULL;
+	if (!dongles || !number_of_coders)
+		return ;
+	i = 0;
+	while (i < number_of_coders)
+		pthread_mutex_destroy(&dongles[i++].mutex_dongle);
+	free(dongles);
+	dongles = NULL;
 }
 
-void    free_heap(t_heap *heap)
+void	free_heap(t_heap *heap)
 {
-    if (!heap)
-        return;
-
-    free(heap->coders);
-    heap->coders = NULL;
-    pthread_mutex_destroy(&heap->mutex_heap);
-
-    free(heap);
-    heap = NULL;
-
-}
-void    free_coders(t_coder *coders, int number_of_coders)
-{
-    int     i;
-
-    if (!coders || !number_of_coders)
-        return ;
-    i = 0;
-    while (i < number_of_coders)
-    {
-        pthread_mutex_destroy(&coders[i].mutex_coder);
-        pthread_cond_destroy(&coders[i].cond_coder);
-        i += 1;
-    }
-    free(coders);
-    coders = NULL;
+	if (!heap)
+		return ;
+	free(heap->coders);
+	heap->coders = NULL;
+	pthread_mutex_destroy(&heap->mutex_heap);
+	free(heap);
+	heap = NULL;
 }
 
-void    free_monitor(t_monitor *monitor)
+void	free_coders(t_coder *coders, int number_of_coders)
 {
-    if (!monitor)
-        return;
+	int	i;
 
-    free(monitor->coders);
-    monitor->coders = NULL;
-
-    free(monitor);
-    monitor = NULL;
+	if (!coders || !number_of_coders)
+		return ;
+	i = 0;
+	while (i < number_of_coders)
+	{
+		pthread_mutex_destroy(&coders[i].mutex_coder);
+		pthread_cond_destroy(&coders[i].cond_coder);
+		i += 1;
+	}
+	free(coders);
+	coders = NULL;
 }
 
-void    free_manager(t_manager *manager)
+void	free_monitor(t_monitor *monitor)
 {
-    if (!manager)
-        return ;
-    free(manager->dongles);
-    manager->dongles = NULL;
-    
-    free(manager);
-    manager = NULL;
+	if (!monitor)
+		return ;
+	free(monitor->coders);
+	monitor->coders = NULL;
+	free(monitor);
+	monitor = NULL;
+}
+
+void	free_manager(t_manager *manager)
+{
+	if (!manager)
+		return ;
+	free(manager->dongles);
+	manager->dongles = NULL;
+	free(manager);
+	manager = NULL;
 }

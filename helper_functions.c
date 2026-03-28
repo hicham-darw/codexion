@@ -1,124 +1,120 @@
 #include "codexion.h"
 
-size_t ft_strlen(const char *str)
+size_t	ft_strlen(const char *str)
 {
-    int     i;
+	int	i;
 
-    i = 0;
-    while (str[i])
-        i++;
-    return i;
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
 }
 
-int     ft_isdigit(int c)
+int	ft_isdigit(int c)
 {
-    return (c >= 48 && c <= 57);
+	return (c >= 48 && c <= 57);
 }
 
-int     real_number(const char *str)
+int	real_number(const char *str)
 {
-    if (!str || !*str)
-        return (0);
-    
-    while (*str && *str == ' ')
-        str++;
-
-    if (*str == '+' || *str == '-')
-    {
-        if (*str == '-')
-            return (0);
-        str++;
-    }
-    if (*str < '0' || *str > '9')
-        return (0);
-    while (*str && *str >= '0' && *str <= '9')
-        str++;
-
-    while (*str && *str == ' ')
-        str++;
-    
-    if (!*str)
-        return (1);
-    return (0);
+	if (!str || !*str)
+		return (0);
+	while (*str && *str == ' ')
+		str++;
+	if (*str == '+' || *str == '-')
+	{
+		if (*str == '-')
+			return (0);
+		str++;
+	}
+	if (*str < '0' || *str > '9')
+		return (0);
+	while (*str && *str >= '0' && *str <= '9')
+		str++;
+	while (*str && *str == ' ')
+		str++;
+	if (!*str)
+		return (1);
+	return (0);
 }
 
-void    *ft_memalloc(size_t size)
+void	*ft_memalloc(size_t size)
 {
-    void    *ptr;
+	void	*ptr;
 
-    if (size <= 0)
-        return (NULL);
-    ptr = malloc(size);
-    if (!ptr)
-        return (NULL);
-    memset(ptr, 0, size);    
-    return (ptr);
+	if (size <= 0)
+		return (NULL);
+	ptr = malloc(size);
+	if (!ptr)
+		return (NULL);
+	memset(ptr, 0, size);
+	return (ptr);
 }
 
-long long     ft_atoll(const char *str)
+long long	ft_atoll(const char *str)
 {
-    long long     res;
+	long long	res;
 
-    if (!real_number(str))
-        return (-1);
-    res = 0;
-    while(*str == ' ')
-        str++;
-    if (*str == '-' || *str == '+')
-    {
-        if (*str == '-')
-            return (-1);
-        str++;
-    }
-    while (*str && *str >= '0' && *str <= '9')
-    {
-        if (res > INT_MAX)
-            return (-1);
-        res = (res * 10) + (*str - '0');
-        str++;
-    }
-    return (res);
+	if (!real_number(str))
+		return (-1);
+	res = 0;
+	while (*str == ' ')
+		str++;
+	if (*str == '-' || *str == '+')
+	{
+		if (*str == '-')
+			return (-1);
+		str++;
+	}
+	while (*str && *str >= '0' && *str <= '9')
+	{
+		if (res > INT_MAX)
+			return (-1);
+		res = (res * 10) + (*str - '0');
+		str++;
+	}
+	return (res);
 }
 
-int     ft_isupper(int c)
+int	ft_isupper(int c)
 {
-    return (c >= 'A' && c <= 'Z');
+	return (c >= 'A' && c <= 'Z');
 }
 
-char    *ft_strtolower(char *str)
+char	*ft_strtolower(char *str)
 {
-    int     i;
+	int		i;
 
-    if (!str)
-        return (NULL);
-    i = 0;
-    while (str[i])
-    {
-        if (ft_isupper(str[i]))
-            str[i] += 32;
-        i += 1;
-    }
-    return (str);
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (str[i])
+	{
+		if (ft_isupper(str[i]))
+			str[i] += 32;
+		i += 1;
+	}
+	return (str);
 }
 
-char    *ft_strdup(const char *str)
+char	*ft_strdup(const char *str)
 {
-    char    *ptr;
-    int     i;
+	char	*ptr;
+	int		i;
 
-    if (!str)
-        return NULL;
-    ptr = malloc(sizeof(char) * (ft_strlen(str) + 1));
-    if (!ptr)
-        return NULL;
-    i = 0;
-    while (str[i])
-    {
-        ptr[i] = str[i];
-        i++;
-    }
-    ptr[i] = 0;
-    return (ptr);
+	if (!str)
+		return (NULL);
+	ptr = ft_memalloc(sizeof(char) * (ft_strlen(str) + 1));
+	if (!ptr)
+		return (NULL);
+	i = 0;
+	while (str[i])
+	{
+		ptr[i] = str[i];
+		i++;
+	}
+	ptr[i] = 0;
+	return (ptr);
 }
 
 int	ft_strcmp(const char *s1, const char *s2)
@@ -131,45 +127,44 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
-char    *ft_strtrim(const char *str)
+char	*ft_strtrim(const char *str)
 {
-    char    *ptr;
-    int     start;
-    int     last;
-    int     i;
+	char	*ptr;
+	int		start;
+	int		last;
+	int		i;
 
-    if (!str)
-        return (NULL);
-    start = 0;
-    last = ft_strlen(str) - 1;
-    while (str[start] == ' ')
-        start ++;
-    while (last >= 0 && str[last] == ' ')
-        last--;
-    if (last < start)
-        return (NULL);
-    ptr = malloc(sizeof(char) * (last - start) + 2);
-    if (!ptr)
-        return (NULL);
-    i = 0;
-    while (str[start] && start <= last)
-    {
-        ptr[i] = str[start];
-        i += 1;
-        start += 1;
-    }
-    ptr[i] = 0;
-    return ptr;
+	if (!str)
+		return (NULL);
+	start = 0;
+	last = ft_strlen(str) - 1;
+	while (str[start] == ' ')
+		start ++;
+	while (last >= 0 && str[last] == ' ')
+		last--;
+	if (last < start)
+		return (NULL);
+	ptr = malloc(sizeof(char) * (last - start) + 2);
+	if (!ptr)
+		return (NULL);
+	i = 0;
+	while (str[start] && start <= last)
+	{
+		ptr[i] = str[start];
+		i += 1;
+		start += 1;
+	}
+	ptr[i] = 0;
+	return (ptr);
 }
 
-
-void free_data_input(t_global *data)
+void	free_data_input(t_global *data)
 {
-    if (!data)
-        return;
-    if (data->schedular)
-        free(data->schedular);
-    if (data->coders)
-        free(data->coders);
-    free(data);
+	if (!data)
+		return ;
+	if (data->schedular)
+		free(data->schedular);
+	if (data->coders)
+		free(data->coders);
+	free(data);
 }
