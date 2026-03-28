@@ -6,7 +6,7 @@
 /*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 04:49:27 by darwin           ###   ########.fr       */
+/*   Updated: 2026/03/28 20:30:53 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,6 +151,11 @@ void		free_heap(t_heap *heap);
 // coder functions
 void		swap_coders(t_coder **a, t_coder **b);
 int			burnout_coder(t_coder *coder);
+void    increment_total_compiling(t_coder *coder);
+void	get_last_compile_time(t_coder *coder);
+int	waiting_to_compile(t_coder *coder);
+void	start_compiling(t_coder *coder);
+int	should_finish(t_coder *coder);
 
 // dongles functions
 void		release_dongles(t_coder *coder);
