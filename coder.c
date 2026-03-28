@@ -34,7 +34,7 @@ int	initial_mutex_coder(t_coder *coders, int i)
 {
 	if (pthread_mutex_init(&coders[i].mutex_coder, NULL))
 	{
-		destroy_mutexes_of_coders_at(coders, i);
+		destroy_mutexes_of_coders_at(coders, i - 1);
 		destroy_conds_of_coders_at(coders, i - 1);
 		return (0);
 	}
@@ -43,7 +43,7 @@ int	initial_mutex_coder(t_coder *coders, int i)
 
 int	initial_cond_coder(t_coder *coders, int i)
 {
-	if (pthread_mutex_init(&coders[i].mutex_coder, NULL))
+	if (pthread_cond_init(&coders[i].cond_coder, NULL))
 	{
 		destroy_mutexes_of_coders_at(coders, i);
 		destroy_conds_of_coders_at(coders, i - 1);

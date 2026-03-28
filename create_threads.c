@@ -30,14 +30,13 @@ int	create_manager_thread(t_global *global_var)
 
 int	create_coders_thread(t_global *global_var)
 {
-	t_coder	coder;
 	int		i;
 
 	i = -1;
 	while (++i < global_var->number_of_coders)
 	{
-		coder = global_var->coders[i];
-		if (pthread_create(&coder.thread, NULL, coder_routine, &coder))
+		if (pthread_create(&global_var->coders[i].thread, NULL,
+				coder_routine, &global_var->coders[i]))
 		{
 			pthread_mutex_destroy(&global_var->mutex_print);
 			pthread_mutex_destroy(&global_var->mutex_time);
