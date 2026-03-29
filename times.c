@@ -27,7 +27,7 @@ void	precise_sleep(long time_ms)
 		usleep(200);
 }
 
-void	print_log(t_coder *coder, char *msg)
+void	print_action(t_coder *coder, char *msg)
 {
 	pthread_mutex_lock(&coder->globals->mutex_print);
 	printf(

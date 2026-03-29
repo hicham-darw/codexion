@@ -50,3 +50,12 @@ t_coder	*initial_coders(t_global **global_var)
 	}
 	return (coders);
 }
+
+void	swap_coders(t_coder **a, t_coder **b)
+{
+	t_coder	*tmp;
+
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}

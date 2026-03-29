@@ -40,7 +40,7 @@ static int	should_stop(t_monitor *monitor, int i, int burnout, int n_compiles)
 {
 	if (burnout)
 	{
-		print_log(monitor->coders[i], "is burned out!!!!!");
+		print_action(monitor->coders[i], "burned out");
 		return (1);
 	}
 	if (n_compiles == monitor->globals->number_of_coders)

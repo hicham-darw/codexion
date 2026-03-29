@@ -41,7 +41,7 @@ void	start_compiling(t_coder *coder)
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->is_compiling = 1;
 	pthread_mutex_unlock(&coder->mutex_coder);
-	print_log(coder, "is compiling");
+	print_action(coder, "is compiling");
 	precise_sleep(coder->globals->time_to_compile);
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->is_compiling = 0;

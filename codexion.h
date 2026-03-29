@@ -6,7 +6,7 @@
 /*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 20:30:53 by darwin           ###   ########.fr       */
+/*   Updated: 2026/03/28 21:11:07 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,8 @@ void		heapify_up(t_heap *heap, int index);
 t_coder		*pop_heap_at(t_heap *heap, int index);
 int			is_empty_heap(t_heap *heap);
 void		free_heap(t_heap *heap);
+int		is_in_heap(t_heap *heap, t_coder *coder);
+
 
 // coder functions
 void		swap_coders(t_coder **a, t_coder **b);
@@ -161,8 +163,8 @@ int	should_finish(t_coder *coder);
 void		release_dongles(t_coder *coder);
 int			take_dongles(t_coder *coder);
 
-// print_log
-void		print_log(t_coder *coder, char *msg);
+// print_actions_precise
+void		print_action(t_coder *coder, char *msg);
 void		precise_sleep(long time_ms);
 
 #endif
