@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   compile.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/30 00:55:24 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/30 02:12:29 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 void	increment_total_compiling(t_coder *coder)
@@ -9,8 +21,12 @@ void	increment_total_compiling(t_coder *coder)
 
 void	get_last_compile_time(t_coder *coder)
 {
+	int	time_burnout;
+
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->last_compile = get_time_by_milisecond();
+	time_burnout = coder->globals->time_to_burnout;
+	coder->deadline = coder->last_compile + time_burnout;
 	pthread_mutex_unlock(&coder->mutex_coder);
 }
 

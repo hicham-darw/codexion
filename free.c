@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/30 01:01:56 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/30 01:05:18 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 void	free_global_var(t_global *global_var)
@@ -28,17 +40,6 @@ void	free_dongles(t_dongle *dongles, int number_of_coders)
 		pthread_mutex_destroy(&dongles[i++].mutex_dongle);
 	free(dongles);
 	dongles = NULL;
-}
-
-void	free_heap(t_heap *heap)
-{
-	if (!heap)
-		return ;
-	free(heap->coders);
-	heap->coders = NULL;
-	pthread_mutex_destroy(&heap->mutex_heap);
-	free(heap);
-	heap = NULL;
 }
 
 void	free_coders(t_coder *coders, int number_of_coders)

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heap.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/30 01:10:24 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/30 02:38:44 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 void	insert_coder_to_heap(t_heap *heap, t_coder *coder)
@@ -13,40 +25,12 @@ void	insert_coder_to_heap(t_heap *heap, t_coder *coder)
 		pthread_mutex_unlock(&heap->mutex_heap);
 		return ;
 	}
+	coder->arrival = get_time_by_milisecond();
 	heap->coders[heap->size] = coder;
-	heapify_up(heap, heap->size);
+	if (!ft_strcmp(coder->globals->schedular, EDF))
+		heapify_up_by_edf(heap, heap->size);
 	heap->size++;
 	pthread_mutex_unlock(&heap->mutex_heap);
-}
-
-void	heapify_down(t_heap *heap, int index)
-{
-	t_coder	**coders;
-	int		left;
-	int		right;
-	int		smallest;
-
-	coders = heap->coders;
-	while (1)
-	{
-		left = index * 2 + 1;
-		right = index * 2 + 2;
-		smallest = index;
-		if (
-			left < heap->size
-			&& coders[left]->last_compile < coders[smallest]->last_compile
-		)
-			smallest = left;
-		if (
-			right < heap->size
-			&& coders[right]->last_compile < coders[smallest]->last_compile
-		)
-			smallest = right;
-		if (smallest == index)
-			break ;
-		swap_coders(&heap->coders[index], &heap->coders[smallest]);
-		index = smallest;
-	}
 }
 
 t_coder	*pop_heap_at(t_heap *heap, int index)
@@ -58,20 +42,20 @@ t_coder	*pop_heap_at(t_heap *heap, int index)
 	removed = heap->coders[index];
 	heap->coders[index] = heap->coders[heap->size - 1];
 	heap->size--;
-	heapify_down(heap, index);
+	if (!ft_strcmp(removed->globals->schedular, EDF))
+		heapify_down_by_edf(heap, index);
+	else
+		heapify_down_by_fifo(heap, index);
 	return (removed);
 }
 
-void	heapify_up(t_heap *heap, int index)
+void	free_heap(t_heap *heap)
 {
-	int	parent;
-
-	while (index > 0)
-	{
-		parent = (index - 1) / 2;
-		if (heap->coders[parent]->id <= heap->coders[index]->id)
-			break ;
-		swap_coders(&heap->coders[parent], &heap->coders[index]);
-		index = parent;
-	}
+	if (!heap)
+		return ;
+	free(heap->coders);
+	heap->coders = NULL;
+	pthread_mutex_destroy(&heap->mutex_heap);
+	free(heap);
+	heap = NULL;
 }

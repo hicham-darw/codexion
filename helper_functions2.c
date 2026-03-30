@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   helper_functions2.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/30 01:11:19 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/30 01:12:55 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
+
 int	ft_isupper(int c)
 {
 	return (c >= 'A' && c <= 'Z');
@@ -72,11 +85,7 @@ char	*ft_strtrim(const char *str)
 		return (NULL);
 	i = 0;
 	while (str[start] && start <= last)
-	{
-		ptr[i] = str[start];
-		i += 1;
-		start += 1;
-	}
+		ptr[i++] = str[start++];
 	ptr[i] = 0;
 	return (ptr);
 }

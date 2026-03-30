@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 21:11:07 by darwin           ###   ########.fr       */
+/*   Updated: 2026/03/30 02:04:46 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 # define USAGE3 "<number_of_compiles_required> <dongle_cooldown> <schedular>\n"
 # define ERR_NUMBER_OF_CODERS "invalid argument 0 < <number_of_coders> <= 200\n"
 # define ERR_INVALID_ARG "invalid argument 0 < argument <= INT_MAX\n"
+# define FIFO "fifo"
+# define EDF "edf"
 
 // dongles
 typedef struct s_dongle
@@ -89,6 +91,8 @@ typedef struct s_coder
 	int					stop;
 	int					can_compile;
 	int					is_compiling;
+	time_t				deadline;
+	time_t				arrival;	
 	time_t				last_compile;
 	t_dongle			*left_dongle;
 	t_dongle			*right_dongle;
@@ -142,22 +146,23 @@ t_manager	*initial_manager(t_global *global);
 
 // heap functions
 void		insert_coder_to_heap(t_heap *heap, t_coder *coder);
-void		heapify_down(t_heap *heap, int index);
-void		heapify_up(t_heap *heap, int index);
+void		heapify_down_by_edf(t_heap *heap, int index);
+void		heapify_down_by_fifo(t_heap *heap, int index);
+void		heapify_up_by_edf(t_heap *heap, int index);
+void		heapify_up_by_fifo(t_heap *heap, int index);
 t_coder		*pop_heap_at(t_heap *heap, int index);
 int			is_empty_heap(t_heap *heap);
 void		free_heap(t_heap *heap);
-int		is_in_heap(t_heap *heap, t_coder *coder);
-
+int			is_in_heap(t_heap *heap, t_coder *coder);
 
 // coder functions
 void		swap_coders(t_coder **a, t_coder **b);
 int			burnout_coder(t_coder *coder);
-void    increment_total_compiling(t_coder *coder);
-void	get_last_compile_time(t_coder *coder);
-int	waiting_to_compile(t_coder *coder);
-void	start_compiling(t_coder *coder);
-int	should_finish(t_coder *coder);
+void		increment_total_compiling(t_coder *coder);
+void		get_last_compile_time(t_coder *coder);
+int			waiting_to_compile(t_coder *coder);
+void		start_compiling(t_coder *coder);
+int			should_finish(t_coder *coder);
 
 // dongles functions
 void		release_dongles(t_coder *coder);

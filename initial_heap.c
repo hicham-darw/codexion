@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   initial_heap.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/30 01:14:56 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/30 01:16:42 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 int	is_empty_heap(t_heap *heap)
@@ -36,11 +48,6 @@ t_heap	*initial_heap(t_global **g)
 		return (NULL);
 	}
 	i = 0;
-	while (i < (*g)->number_of_coders)
-	{
-		heap->coders[i] = &(*g)->coders[i];
-		i += 1;
-	}
 	heap->size = 0;
 	heap->capacity = (*g)->number_of_coders;
 	if (pthread_mutex_init(&heap->mutex_heap, NULL))

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   dongle.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/30 01:00:43 by hel-hamo          #+#    #+#             */
+/*   Updated: 2026/03/30 01:04:13 by hel-hamo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 int	lock_dongles(t_coder *coder)
@@ -31,8 +43,8 @@ int	take_dongles(t_coder *coder)
 		&& coder->right_dongle->cooldown_time <= now
 	)
 	{
-        print_action(coder, "has taken a dongle");
-        print_action(coder, "has taken a dongle");
+		print_action(coder, "has taken a dongle");
+		print_action(coder, "has taken a dongle");
 		coder->left_dongle->is_taken = 1;
 		coder->right_dongle->is_taken = 1;
 		return (1);
