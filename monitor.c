@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:24:11 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 01:24:12 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/30 03:45:00 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	check_each_coder(t_coder *coder, int *finish_compile, int *burnout)
 	if (
 		!coder->is_compiling
 		&& burnout_coder(coder)
-		&& (coder->last_compile != 0)
+		&& coder->last_compile
 	)
 	{
 		*burnout = 1;

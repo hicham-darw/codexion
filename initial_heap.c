@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   initial_heap.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:14:56 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 01:16:42 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/30 03:45:11 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ int	is_in_heap(t_heap *heap, t_coder *coder)
 t_heap	*initial_heap(t_global **g)
 {
 	t_heap	*heap;
-	int		i;
 
 	if (!(*g))
 		return (NULL);
@@ -47,7 +46,6 @@ t_heap	*initial_heap(t_global **g)
 		free(heap);
 		return (NULL);
 	}
-	i = 0;
 	heap->size = 0;
 	heap->capacity = (*g)->number_of_coders;
 	if (pthread_mutex_init(&heap->mutex_heap, NULL))
