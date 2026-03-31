@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join_threads.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:58:41 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 00:58:43 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/31 23:44:05 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,21 @@ int	join_manager(t_global *global_var)
 	return (1);
 }
 
-int	join_coders(t_global *global_var)
+int	join_coders_at(t_coder *coders, int number_of_coders)
 {
-	int	i;
+	t_global	*globals;
+	int			i;
 
+	globals = coders[0].globals;
 	i = -1;
-	while (++i < global_var->number_of_coders)
+	while (++i < number_of_coders)
 	{
-		if (pthread_join(global_var->coders[i].thread, NULL))
+		if (pthread_join(globals->coders[i].thread, NULL))
 		{
-			pthread_mutex_destroy(&global_var->mutex_print);
-			pthread_mutex_destroy(&global_var->mutex_time);
-			pthread_mutex_destroy(&global_var->mutex_stop);
-			free_global_var(global_var);
+			pthread_mutex_destroy(&globals->mutex_print);
+			pthread_mutex_destroy(&globals->mutex_time);
+			pthread_mutex_destroy(&globals->mutex_stop);
+			free_global_var(globals);
 			return (0);
 		}
 	}
@@ -61,7 +63,7 @@ int	join_threads(t_global *global_var)
 {
 	if (!join_manager(global_var))
 		return (0);
-	if (!join_coders(global_var))
+	if (!join_coders_at(global_var->coders, global_var->number_of_coders))
 		return (0);
 	if (!join_monitor(global_var))
 		return (0);

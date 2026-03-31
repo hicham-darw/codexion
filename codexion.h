@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 02:04:46 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/31 23:23:14 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,7 @@ void		get_last_compile_time(t_coder *coder);
 int			waiting_to_compile(t_coder *coder);
 void		start_compiling(t_coder *coder);
 int			should_finish(t_coder *coder);
+int			join_coders_at(t_coder *coders, int number_of_coders);
 
 // dongles functions
 void		release_dongles(t_coder *coder);

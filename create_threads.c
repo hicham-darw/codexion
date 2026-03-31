@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   create_threads.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 02:01:16 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 02:13:16 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/31 23:23:33 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ int	create_coders_thread(t_global *global_var)
 		if (pthread_create(&global_var->coders[i].thread, NULL,
 				coder_routine, &global_var->coders[i]))
 		{
+			pthread_join(global_var->manager->thread, NULL);
+			join_coders_at(global_var->coders, i);
 			pthread_mutex_destroy(&global_var->mutex_print);
 			pthread_mutex_destroy(&global_var->mutex_time);
 			pthread_mutex_destroy(&global_var->mutex_stop);
@@ -55,6 +57,8 @@ int	create_monitor_thread(t_global *global_var)
 	monitor = global_var->monitor;
 	if (pthread_create(&monitor->thread, NULL, monitor_routine, monitor))
 	{
+		pthread_join(global_var->manager->thread, NULL);
+		join_coders_at(global_var->coders, global_var->number_of_coders);
 		pthread_mutex_destroy(&global_var->mutex_print);
 		pthread_mutex_destroy(&global_var->mutex_time);
 		pthread_mutex_destroy(&global_var->mutex_stop);
