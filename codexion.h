@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:50:11 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 01:39:18 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@
 # include <string.h>
 # include <limits.h>
 
-# define USAGE1 "Usage: ./codexion <number_of_coders> <time_to_burnout> "
-# define USAGE2 "<time_to_compile> <time_to_debug> <time_to_refactor> "
-# define USAGE3 "<number_of_compiles_required> <dongle_cooldown> <schedular>\n"
+# define USAGE1 "Usage: ./codexion <number_of_coders> <time_to_burnout>"
+# define USAGE2 "<time_to_compile> <time_to_debug> <time_to_refactor>"
+# define USAGE3 "<number_of_compiles_required> <dongle_cooldown> <schedular>"
 # define ERR_NUMBER_OF_CODERS "invalid argument 0 < <number_of_coders> <= 200\n"
 # define ERR_INVALID_ARG "invalid argument 0 < argument <= INT_MAX\n"
 # define FIFO "fifo"

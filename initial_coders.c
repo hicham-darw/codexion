@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   initial_coders.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:56:45 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 00:56:48 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 05:44:38 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int	initial_mutex_coder(t_coder *coders, int i)
 {
 	if (pthread_mutex_init(&coders[i].mutex_coder, NULL))
 	{
-		destroy_mutexes_of_coders_at(coders, i - 1);
-		destroy_conds_of_coders_at(coders, i - 1);
+		destroy_mutexes_of_coders_at(coders, i);
+		destroy_conds_of_coders_at(coders, i);
 		return (0);
 	}
 	return (1);
@@ -27,8 +27,8 @@ int	initial_cond_coder(t_coder *coders, int i)
 {
 	if (pthread_cond_init(&coders[i].cond_coder, NULL))
 	{
-		destroy_mutexes_of_coders_at(coders, i);
-		destroy_conds_of_coders_at(coders, i - 1);
+		destroy_mutexes_of_coders_at(coders, i + 1);
+		destroy_conds_of_coders_at(coders, i);
 		return (0);
 	}
 	return (1);

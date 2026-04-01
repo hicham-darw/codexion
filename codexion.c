@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:13:19 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 01:14:49 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 06:05:17 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,6 @@ int	main(int ac, char **av)
 	pthread_mutex_destroy(&global_var->mutex_time);
 	pthread_mutex_destroy(&global_var->mutex_stop);
 	free_global_var(global_var);
+	free(global_var);
 	return (0);
 }

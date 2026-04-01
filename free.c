@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:01:56 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:51:06 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 05:45:56 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	free_global_var(t_global *global_var)
 	free_heap(global_var->heap);
 	free_manager(global_var->manager);
 	free_monitor(global_var->monitor);
-	free(global_var);
 }
 
 void	free_dongles(t_dongle *dongles, int number_of_coders)
@@ -53,7 +52,6 @@ void	free_coders(t_coder *coders, int number_of_coders)
 		i += 1;
 	}
 	free(coders);
-	coders = NULL;
 }
 
 void	free_monitor(t_monitor *monitor)

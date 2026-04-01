@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   initial_heap.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:14:56 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 03:45:11 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/01 05:29:29 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ t_heap	*initial_heap(t_global **g)
 {
 	t_heap	*heap;
 
-	if (!(*g))
-		return (NULL);
 	heap = ft_memalloc(sizeof(t_heap));
 	if (!heap)
 		return (NULL);

@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 02:01:16 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:23:33 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 06:08:35 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ int	create_manager_thread(t_global *global_var)
 		pthread_mutex_destroy(&global_var->mutex_time);
 		pthread_mutex_destroy(&global_var->mutex_stop);
 		free_global_var(global_var);
+		free(global_var);
 		return (0);
 	}
 	return (1);
@@ -44,6 +45,7 @@ int	create_coders_thread(t_global *global_var)
 			pthread_mutex_destroy(&global_var->mutex_time);
 			pthread_mutex_destroy(&global_var->mutex_stop);
 			free_global_var(global_var);
+			free(global_var);
 			return (0);
 		}
 	}
@@ -63,6 +65,7 @@ int	create_monitor_thread(t_global *global_var)
 		pthread_mutex_destroy(&global_var->mutex_time);
 		pthread_mutex_destroy(&global_var->mutex_stop);
 		free_global_var(global_var);
+		free(global_var);
 		return (0);
 	}
 	return (1);
