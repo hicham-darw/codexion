@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:23:14 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/31 23:50:11 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ typedef struct s_global
 	int					time_to_refactor;
 	int					number_of_compiles_required;
 	int					dongle_cooldown;
-	char				*schedular;
+	char				*scheduler;
 	time_t				start_time;
 	int					stop;
 	pthread_mutex_t		mutex_stop;

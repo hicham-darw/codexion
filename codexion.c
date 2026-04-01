@@ -6,7 +6,7 @@
 /*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:13:19 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/28 20:28:26 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/01 01:14:49 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	main(int ac, char **av)
 
 	if (ac != 9)
 	{
-		fprintf(stderr, USAGE1);
+		fprintf(stderr, "%s %s %s\n", USAGE1, USAGE2, USAGE3);
 		return (42);
 	}
 	global_var = parse_arguments(av + 1);

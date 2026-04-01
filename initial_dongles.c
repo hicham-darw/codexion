@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   initial_dongles.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:59:09 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 00:59:11 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 01:26:49 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,9 @@ t_dongle	*initial_dongles(int number_of_coders)
 	t_dongle	*dongle;
 	int			i;
 
-	dongle = malloc(sizeof(t_dongle) * (number_of_coders));
+	dongle = ft_memalloc(sizeof(t_dongle) * (number_of_coders));
 	if (!dongle)
 		return (NULL);
-	memset(dongle, 0, sizeof(t_dongle) * (number_of_coders));
 	i = 0;
 	while (i < number_of_coders)
 	{

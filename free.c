@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:01:56 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 01:05:18 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/31 23:51:06 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,8 @@ void	free_global_var(t_global *global_var)
 {
 	if (!global_var)
 		return ;
-	if (global_var->schedular)
-	{
-		free(global_var->schedular);
-		global_var->schedular = NULL;
-	}
+	if (global_var->scheduler)
+		free(global_var->scheduler);
 	free_coders(global_var->coders, global_var->number_of_coders);
 	free_dongles(global_var->dongles, global_var->number_of_coders);
 	free_heap(global_var->heap);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:00:26 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 01:00:27 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/03/31 23:53:24 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,22 +63,22 @@ static t_global	*parse_numbers(t_global *valid_input, char **av)
 
 static char	*parse_schedular(char *arg)
 {
-	char	*schedular;
+	char	*scheduler;
 	int		cmp_1;
 	int		cmp_2;
 
-	schedular = ft_strtrim(arg);
-	if (!schedular)
+	scheduler = ft_strtrim(arg);
+	if (!scheduler)
 		return (NULL);
-	cmp_1 = ft_strcmp(ft_strtolower(schedular), "fifo");
-	cmp_2 = ft_strcmp(ft_strtolower(schedular), "edf");
+	cmp_1 = ft_strcmp(ft_strtolower(scheduler), "fifo");
+	cmp_2 = ft_strcmp(ft_strtolower(scheduler), "edf");
 	if (cmp_1 && cmp_2)
 	{
-		free(schedular);
-		schedular = NULL;
+		free(scheduler);
+		scheduler = NULL;
 		return (NULL);
 	}
-	return (ft_strtolower(schedular));
+	return (ft_strtolower(scheduler));
 }
 
 t_global	*parse_arguments(char **av)
@@ -94,8 +94,8 @@ t_global	*parse_arguments(char **av)
 	valid_input = parse_numbers(valid_input, av);
 	if (!valid_input)
 		return (NULL);
-	valid_input->schedular = parse_schedular(av[7]);
-	if (!valid_input->schedular)
+	valid_input->scheduler = parse_schedular(av[7]);
+	if (!valid_input->scheduler)
 	{
 		free(valid_input);
 		return (NULL);

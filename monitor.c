@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:24:11 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:46:17 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/01 01:25:00 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	check_each_coder(t_coder *coder, int *finish_compile, int *burnout)
 		return ;
 	}
 	if (coder->globals->number_of_compiles_required == coder->total_compiling)
-		finish_compile += 1;
+		*finish_compile += 1;
 	if (
 		!coder->is_compiling
 		&& burnout_coder(coder)
