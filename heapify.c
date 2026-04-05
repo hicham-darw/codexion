@@ -26,10 +26,10 @@ void	heapify_down_by_fifo(t_heap *heap, int index)
 		right = index * 2 + 2;
 		smallest = index;
 		if (left < heap->size
-			&& coders[left]->deadline < coders[smallest]->deadline)
+			&& coders[left]->arrival < coders[smallest]->arrival)
 			smallest = left;
 		if (right < heap->size
-			&& coders[right]->deadline < coders[smallest]->deadline)
+			&& coders[right]->arrival < coders[smallest]->arrival)
 			smallest = right;
 		if (smallest == index)
 			break ;

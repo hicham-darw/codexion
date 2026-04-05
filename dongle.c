@@ -6,7 +6,7 @@
 /*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:00:43 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/30 03:45:53 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/05 08:39:42 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ int	take_dongles(t_coder *coder)
 		&& coder->right_dongle->cooldown_time <= now
 	)
 	{
-		print_action(coder, "has taken a dongle");
-		print_action(coder, "has taken a dongle");
 		coder->left_dongle->is_taken = 1;
 		coder->right_dongle->is_taken = 1;
 		return (1);

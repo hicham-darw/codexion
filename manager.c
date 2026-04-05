@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   manager.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:00:14 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:32:37 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 08:30:31 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	pop_all_available_to_compile(t_manager *manager)
 		coder = manager->heap->coders[i];
 		if (take_dongles(coder))
 		{
+			print_action(coder, "has taken a dongle");
+			print_action(coder, "has taken a dongle");
 			pop_coder_to_compile(manager, coder, i);
 			continue ;
 		}

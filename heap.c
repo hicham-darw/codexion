@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heap.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:10:24 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 01:31:57 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 08:37:03 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ void	insert_coder_to_heap(t_heap *heap, t_coder *coder)
 	heap->coders[heap->size] = coder;
 	if (!ft_strcmp(coder->globals->scheduler, EDF))
 		heapify_up_by_edf(heap, heap->size);
+	else
+		heapify_up_by_fifo(heap, heap->size);
 	heap->size++;
 	pthread_mutex_unlock(&heap->mutex_heap);
 }
