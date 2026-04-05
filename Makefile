@@ -1,6 +1,6 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-LDFLAGS = -pthread
+LDFLAGS = -pthread -fsanitize=address
 NAME = codexion
 SRC = coder.c codexion.c compile.c create_threads.c destroy.c dongle.c \
 		free.c heap.c heapify.c helper_functions_one.c helper_functions_two.c \

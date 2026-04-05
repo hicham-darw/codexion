@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 01:39:18 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 03:49:41 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 # define ERR_INVALID_ARG "invalid argument 0 < argument <= INT_MAX\n"
 # define FIFO "fifo"
 # define EDF "edf"
+# define TRUE 1
+# define FALSE 0
 
 // dongles
 typedef struct s_dongle
@@ -52,6 +54,7 @@ typedef struct s_manager
 	t_dongle			**dongles;
 	struct s_global		*globals;
 	t_heap				*heap;
+	pthread_mutex_t		mutex_heap;
 }	t_manager;
 
 typedef struct s_global
@@ -66,15 +69,16 @@ typedef struct s_global
 	char				*scheduler;
 	time_t				start_time;
 	int					stop;
-	pthread_mutex_t		mutex_stop;
 	struct s_coder		*coders;
 	struct s_dongle		*dongles;
 	struct s_monitor	*monitor;
 	struct s_manager	*manager;
 	struct s_heap		*heap;
+	pthread_mutex_t		mutex_stop;
 	pthread_mutex_t		mutex_time;
 	pthread_mutex_t		mutex_print;
 }	t_global;
+
 
 typedef struct s_monitor
 {
@@ -172,5 +176,8 @@ int			take_dongles(t_coder *coder);
 // print_actions_precise
 void		print_action(t_coder *coder, char *msg);
 void		precise_sleep(long time_ms);
+
+// stop
+void	change_stop_var(t_monitor *monitor);
 
 #endif

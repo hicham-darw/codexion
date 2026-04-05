@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:24:11 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 01:25:00 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 03:19:30 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static void	change_stop_var(t_monitor *monitor)
+void	change_stop_var(t_monitor *monitor)
 {
 	pthread_mutex_lock(&monitor->globals->mutex_stop);
 	monitor->globals->stop = 1;

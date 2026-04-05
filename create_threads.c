@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   create_threads.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 02:01:16 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 06:08:35 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 03:48:37 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,63 +24,77 @@ int	create_manager_thread(t_global *global_var)
 		pthread_mutex_destroy(&global_var->mutex_stop);
 		free_global_var(global_var);
 		free(global_var);
-		return (0);
+		return (FALSE);
 	}
-	return (1);
+	return (TRUE);
 }
 
 int	create_coders_thread(t_global *global_var)
 {
-	int		i;
+	t_coder		*coders;
+	int			i;
 
+	coders = global_var->coders;
 	i = -1;
 	while (++i < global_var->number_of_coders)
 	{
-		if (pthread_create(&global_var->coders[i].thread, NULL,
-				coder_routine, &global_var->coders[i]))
+		if (pthread_create(&coders[i].thread, NULL,
+				coder_routine, &coders[i]))
 		{
+			change_stop_var(global_var->monitor);
 			pthread_join(global_var->manager->thread, NULL);
-			join_coders_at(global_var->coders, i);
+			while (--i >= 0)
+				pthread_join(coders[i].thread, NULL);
 			pthread_mutex_destroy(&global_var->mutex_print);
 			pthread_mutex_destroy(&global_var->mutex_time);
 			pthread_mutex_destroy(&global_var->mutex_stop);
 			free_global_var(global_var);
 			free(global_var);
-			return (0);
+			return (FALSE);
 		}
 	}
-	return (1);
+	return (TRUE);
 }
 
 int	create_monitor_thread(t_global *global_var)
 {
 	t_monitor	*monitor;
+	int			i;
 
 	monitor = global_var->monitor;
 	if (pthread_create(&monitor->thread, NULL, monitor_routine, monitor))
 	{
+		change_stop_var(global_var->monitor);
 		pthread_join(global_var->manager->thread, NULL);
-		join_coders_at(global_var->coders, global_var->number_of_coders);
+		i = -1;
+		while (++i < global_var->number_of_coders)
+			pthread_join(global_var->coders[i].thread, NULL);
 		pthread_mutex_destroy(&global_var->mutex_print);
 		pthread_mutex_destroy(&global_var->mutex_time);
 		pthread_mutex_destroy(&global_var->mutex_stop);
 		free_global_var(global_var);
 		free(global_var);
-		return (0);
+		return (FALSE);
 	}
-	return (1);
+	return (TRUE);
 }
 
 int	create_threads(t_global *global_var)
 {
 	if (!create_manager_thread(global_var))
-		return (0);
-	pthread_mutex_lock(&global_var->mutex_time);
+		return (FALSE);
 	global_var->start_time = get_time_by_milisecond();
-	pthread_mutex_unlock(&global_var->mutex_time);
+	if (global_var->start_time == -1)
+	{
+		change_stop_var(global_var->monitor);
+		pthread_join(global_var->manager->thread, NULL);
+		free_global_var(global_var);
+		free(global_var);
+		return (FALSE);
+	}
 	if (!create_coders_thread(global_var))
-		return (0);
+		return (FALSE);
 	if (!create_monitor_thread(global_var))
-		return (0);
-	return (1);
+		return (FALSE);
+	return (TRUE);
 }

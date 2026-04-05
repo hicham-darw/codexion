@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:00:26 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/03/31 23:53:24 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 02:14:06 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static int	add_parsed_number(t_global **global, int number, int index)
 {
 	if (!global)
-		return (0);
+		return (FALSE);
 	if (index == 0)
 		(*global)->number_of_coders = number;
 	else if (index == 1)
@@ -30,7 +30,7 @@ static int	add_parsed_number(t_global **global, int number, int index)
 		(*global)->number_of_compiles_required = number;
 	else if (index == 6)
 		(*global)->dongle_cooldown = number;
-	return (1);
+	return (TRUE);
 }
 
 static t_global	*parse_numbers(t_global *valid_input, char **av)

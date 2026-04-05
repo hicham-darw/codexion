@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:13:19 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 06:05:17 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/05 02:13:18 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,21 +19,21 @@ int	main(int ac, char **av)
 	if (ac != 9)
 	{
 		fprintf(stderr, "%s %s %s\n", USAGE1, USAGE2, USAGE3);
-		return (42);
+		return (EXIT_FAILURE);
 	}
 	global_var = parse_arguments(av + 1);
 	if (!global_var)
-		return (42);
+		return (EXIT_FAILURE);
 	if (
 		!initializer(&global_var)
 		|| !create_threads(global_var)
 		|| !join_threads(global_var)
 	)
-		return (42);
+		return (EXIT_FAILURE);
 	pthread_mutex_destroy(&global_var->mutex_print);
 	pthread_mutex_destroy(&global_var->mutex_time);
 	pthread_mutex_destroy(&global_var->mutex_stop);
 	free_global_var(global_var);
 	free(global_var);
-	return (0);
+	return (EXIT_SUCCESS);
 }
