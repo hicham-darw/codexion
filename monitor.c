@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:24:11 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/06 02:00:48 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/06 03:22:53 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,19 @@ static int	should_stop(t_monitor *monitor, int i, int burnout, int n_compiles)
 	return (0);
 }
 
+int	error_in_time_coder(t_coder *coder)
+{
+	pthread_mutex_lock(&coder->mutex_coder);
+	if (coder->last_compile == -1 || coder->arrival == -1 || coder->deadline == -1)
+	{
+		pthread_mutex_unlock(&coder->mutex_coder);
+		change_stop_var(coder->globals->monitor);
+		return (1);
+	}
+	pthread_mutex_unlock(&coder->mutex_coder);
+	return (0);
+}
+
 void	*monitor_routine(void *args)
 {
 	t_monitor	*monitor;
@@ -74,6 +87,8 @@ void	*monitor_routine(void *args)
 		finished = 0;
 		while (i < monitor->globals->number_of_coders)
 		{
+			if(error_in_time_coder(monitor->coders[i]))
+				return (NULL);
 			check_each_coder(monitor->coders[i], &finished, &burned_out);
 			if (burned_out)
 				break ;
