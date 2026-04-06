@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:24:11 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/05 03:19:30 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/06 02:00:48 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	check_each_coder(t_coder *coder, int *finish_compile, int *burnout)
 		pthread_mutex_unlock(&coder->mutex_coder);
 		return ;
 	}
-	if (coder->globals->number_of_compiles_required == coder->total_compiling)
+	if (coder->globals->number_of_compiles_required <= coder->total_compiling)
 		*finish_compile += 1;
 	if (
 		!coder->is_compiling
@@ -54,7 +54,7 @@ static int	should_stop(t_monitor *monitor, int i, int burnout, int n_compiles)
 		print_action(monitor->coders[i], "burned out");
 		return (1);
 	}
-	if (n_compiles == monitor->globals->number_of_coders)
+	if (n_compiles >= monitor->globals->number_of_coders)
 		return (1);
 	return (0);
 }
