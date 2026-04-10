@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/05 03:49:41 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/10 22:16:55 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ typedef struct s_global
 	pthread_mutex_t		mutex_print;
 }	t_global;
 
-
 typedef struct s_monitor
 {
 	pthread_t			thread;
@@ -108,13 +107,13 @@ typedef struct s_coder
 // helper functions
 size_t		ft_strlen(const char *str);
 long long	ft_atoll(const char *str);
-char		*ft_strdup(const char *str);
+// char		*ft_strdup(const char *str);
 int			ft_strcmp(const char *s1, const char *s2);
 char		*ft_strtrim(const char *str);
 char		*ft_strtolower(char *str);
 void		*ft_memalloc(size_t size);
 
-// parser functions
+// // parser functions
 t_global	*parse_arguments(char **argv);
 
 int			initializer(t_global **global_var);
@@ -122,33 +121,36 @@ t_dongle	*initial_dongles(int number_of_coders);
 t_coder		*initial_coders(t_global **global_var);
 t_monitor	*initial_monitor(t_global *global_var);
 t_heap		*initial_heap(t_global **global_var);
+t_manager	*initial_manager(t_global *global);
 
-// threads_functions
+// // threads_functions
 int			create_threads(t_global *global_var);
 int			join_threads(t_global *globals_var);
 
-// routine functions
+// // routine functions
 void		*coder_routine(void *args);
 void		*monitor_routine(void *args);
 void		*manager_routine(void *args);
 
-// times functions
+// // times functions
 time_t		get_time_by_milisecond(void);
 
-// free memory
+// // free memory
 void		free_global_var(t_global *global_var);
 void		free_coders(t_coder *coder, int number_of_coders);
 void		free_dongles(t_dongle *dongles, int number_of_coders);
 void		free_manager(t_manager *manager);
 void		free_monitor(t_monitor *monitor);
+void		free_heap(t_heap *heap);
+
+//destroy
 void		destroy_mutexes_of_coders_at(t_coder *coders, int i);
 void		destroy_conds_of_coders_at(t_coder *coders, int i);
 void		destroy_mutexes_of_dongles_at(t_dongle *dongle, int i);
 
-// manager functions
-t_manager	*initial_manager(t_global *global);
+// // manager functions
 
-// heap functions
+// // heap functions
 void		insert_coder_to_heap(t_heap *heap, t_coder *coder);
 void		heapify_down_by_edf(t_heap *heap, int index);
 void		heapify_down_by_fifo(t_heap *heap, int index);
@@ -156,10 +158,9 @@ void		heapify_up_by_edf(t_heap *heap, int index);
 void		heapify_up_by_fifo(t_heap *heap, int index);
 t_coder		*pop_heap_at(t_heap *heap, int index);
 int			is_empty_heap(t_heap *heap);
-void		free_heap(t_heap *heap);
 int			is_in_heap(t_heap *heap, t_coder *coder);
 
-// coder functions
+// // coder functions
 void		swap_coders(t_coder **a, t_coder **b);
 int			burnout_coder(t_coder *coder);
 void		increment_total_compiling(t_coder *coder);
@@ -167,17 +168,17 @@ void		get_last_compile_time(t_coder *coder);
 int			waiting_to_compile(t_coder *coder);
 void		start_compiling(t_coder *coder);
 int			should_finish(t_coder *coder);
-int			join_coders_at(t_coder *coders, int number_of_coders);
+// int			join_coders_at(t_coder *coders, int number_of_coders);
 
-// dongles functions
+// // dongles functions
 void		release_dongles(t_coder *coder);
 int			take_dongles(t_coder *coder);
 
-// print_actions_precise
+// // print_actions_precise
 void		print_action(t_coder *coder, char *msg);
 void		precise_sleep(long time_ms);
 
-// stop
-void	change_stop_var(t_monitor *monitor);
+// // stop
+void		change_stop_var(t_monitor *monitor);
 
 #endif

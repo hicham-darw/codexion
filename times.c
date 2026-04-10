@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   times.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:58:50 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/05 03:13:11 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/10 21:45:37 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ time_t	get_time_by_milisecond(void)
 	if (gettimeofday(&t_val, NULL))
 	{
 		fprintf(stderr, "Error: getimeofday failed!\n");
-		return -1;
+		return (-1);
 	}
 	return ((t_val.tv_sec * 1000) + (t_val.tv_usec / 1000));
 }
