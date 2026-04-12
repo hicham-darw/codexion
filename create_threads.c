@@ -6,7 +6,7 @@
 /*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 02:01:16 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/05 03:48:37 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/12 14:23:38 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	create_manager_thread(t_global *global_var)
 int	create_coders_thread(t_global *global_var)
 {
 	t_coder		*coders;
-	int			i;
+	long		i;
 
 	coders = global_var->coders;
 	i = -1;
@@ -59,7 +59,7 @@ int	create_coders_thread(t_global *global_var)
 int	create_monitor_thread(t_global *global_var)
 {
 	t_monitor	*monitor;
-	int			i;
+	long		i;
 
 	monitor = global_var->monitor;
 	if (pthread_create(&monitor->thread, NULL, monitor_routine, monitor))
