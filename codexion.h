@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/28 01:19:20 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/12 14:22:56 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/13 18:25:59 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,7 @@ int			take_dongles(t_coder *coder);
 
 // // print_actions_precise
 void		print_action(t_coder *coder, char *msg);
-void		precise_sleep(long time_ms);
+void		precise_sleep(t_coder *coder, long time_ms);
 
 // // stop
 void		change_stop_var(t_monitor *monitor);

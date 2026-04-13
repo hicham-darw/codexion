@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:58:50 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/10 21:45:37 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/13 18:26:58 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,20 @@ int	burnout_coder(t_coder *coder)
 	return (0);
 }
 
-void	precise_sleep(long time_ms)
+void	precise_sleep(t_coder *coder, long time_ms)
 {
 	long	start;
 
 	start = get_time_by_milisecond();
 	while (get_time_by_milisecond() - start < time_ms)
+	{
+		pthread_mutex_lock(&coder->globals->mutex_stop);
+		if (coder->globals->stop)
+			break;
+		pthread_mutex_unlock(&coder->globals->mutex_stop);
 		usleep(200);
+	}
+	pthread_mutex_unlock(&coder->globals->mutex_stop);
 }
 
 void	print_action(t_coder *coder, char *msg)

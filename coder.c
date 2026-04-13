@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/27 20:54:35 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/05 03:48:00 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/13 18:26:31 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,19 +27,19 @@ int	should_finish(t_coder *coder)
 static void	sleep_odd_ids(int id)
 {
 	if (id % 2)
-		usleep(200);
+		usleep(6000);
 }
 
 static void	start_debugging(t_coder *coder)
 {
 	print_action(coder, "is debugging");
-	precise_sleep(coder->globals->time_to_debug);
+	precise_sleep(coder, coder->globals->time_to_debug);
 }
 
 static void	start_refactoring(t_coder *coder)
 {
 	print_action(coder, "is refactoring");
-	precise_sleep(coder->globals->time_to_refactor);
+	precise_sleep(coder, coder->globals->time_to_refactor);
 }
 
 void	*coder_routine(void *arg)

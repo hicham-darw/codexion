@@ -6,7 +6,7 @@
 /*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:55:24 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/01 01:21:46 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/13 18:25:19 by hel-hamo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	start_compiling(t_coder *coder)
 	coder->is_compiling = 1;
 	pthread_mutex_unlock(&coder->mutex_coder);
 	print_action(coder, "is compiling");
-	precise_sleep(coder->globals->time_to_compile);
+	precise_sleep(coder, coder->globals->time_to_compile);
 	pthread_mutex_lock(&coder->mutex_coder);
 	coder->is_compiling = 0;
 	pthread_mutex_unlock(&coder->mutex_coder);
