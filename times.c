@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   times.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hel-hamo <hel-hamo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 00:58:50 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/13 18:26:58 by hel-hamo         ###   ########.fr       */
+/*   Updated: 2026/04/14 00:10:33 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,13 @@ void	precise_sleep(t_coder *coder, long time_ms)
 	{
 		pthread_mutex_lock(&coder->globals->mutex_stop);
 		if (coder->globals->stop)
+		{
+			pthread_mutex_unlock(&coder->globals->mutex_stop);
 			break;
+		}
 		pthread_mutex_unlock(&coder->globals->mutex_stop);
 		usleep(200);
 	}
-	pthread_mutex_unlock(&coder->globals->mutex_stop);
 }
 
 void	print_action(t_coder *coder, char *msg)
