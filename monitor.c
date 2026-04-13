@@ -64,7 +64,6 @@ int	error_in_time_coder(t_coder *coder)
 	pthread_mutex_lock(&coder->mutex_coder);
 	if (
 		coder->last_compile == -1
-		|| coder->arrival == -1
 		|| coder->deadline == -1
 	)
 	{

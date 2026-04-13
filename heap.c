@@ -6,7 +6,7 @@
 /*   By: darwin <darwin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/30 01:10:24 by hel-hamo          #+#    #+#             */
-/*   Updated: 2026/04/05 08:37:03 by darwin           ###   ########.fr       */
+/*   Updated: 2026/04/13 01:59:51 by darwin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ void	insert_coder_to_heap(t_heap *heap, t_coder *coder)
 		pthread_mutex_unlock(&heap->mutex_heap);
 		return ;
 	}
+	pthread_mutex_lock(&coder->mutex_coder);
 	coder->arrival = get_time_by_milisecond();
+	pthread_mutex_unlock(&coder->mutex_coder);
+
 	heap->coders[heap->size] = coder;
 	if (!ft_strcmp(coder->globals->scheduler, EDF))
 		heapify_up_by_edf(heap, heap->size);
