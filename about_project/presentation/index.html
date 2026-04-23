@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multithreading -> Producer-Consumer Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #041c32;
+      --bg-2: #064663;
+      --bg-3: #ecb365;
+      --ink: #f8f5f1;
+      --muted: #d7e3ea;
+      --accent: #ff7f50;
+      --card: rgba(255, 255, 255, 0.1);
+      --card-border: rgba(255, 255, 255, 0.18);
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      scroll-behavior: smooth;
+      font-family: "Space Grotesk", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 127, 80, 0.22), transparent 38%),
+        radial-gradient(circle at 88% 80%, rgba(236, 179, 101, 0.28), transparent 38%),
+        linear-gradient(145deg, var(--bg-1), var(--bg-2) 42%, #022b42 74%, #02131f);
+      overflow-x: hidden;
+    }
+
+    body {
+      position: relative;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.06) 0.6px, transparent 0.6px);
+      background-size: 3px 3px;
+      opacity: 0.25;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .deck {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-padding-top: 12px;
+    }
+
+    .slide {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      padding: 90px clamp(20px, 5vw, 90px) 110px;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-content: center;
+      gap: 22px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: reveal 700ms ease forwards;
+      animation-delay: calc(var(--i) * 70ms);
+    }
+
+    @keyframes reveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide h1,
+    .slide h2 {
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .slide h1 {
+      font-size: clamp(2rem, 4.5vw, 4.5rem);
+      max-width: 900px;
+    }
+
+    .slide h2 {
+      font-size: clamp(1.5rem, 3.8vw, 3.2rem);
+      max-width: 900px;
+    }
+
+    .lead {
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      max-width: 900px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .author-credit {
+      font-weight: 700;
+      color: #ffd28f;
+    }
+
+    .card {
+      max-width: 980px;
+      border: 1px solid var(--card-border);
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+      border-radius: 20px;
+      padding: clamp(18px, 2.5vw, 32px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .card p {
+      margin: 0;
+      font-size: clamp(0.98rem, 1.6vw, 1.12rem);
+      line-height: 1.75;
+      color: var(--ink);
+    }
+
+    .card p.concise {
+      line-height: 1.55;
+      letter-spacing: 0.01em;
+    }
+
+    .card + .card {
+      margin-top: -6px;
+    }
+
+    .split {
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .diagram {
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+      box-shadow: var(--shadow);
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .diagram-title {
+      margin: 0 0 8px;
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      letter-spacing: 0.05em;
+      color: #ffe7cb;
+    }
+
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: #fff5e7;
+      background: rgba(2, 19, 31, 0.35);
+    }
+
+    .meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.88rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #ffe7cb;
+      opacity: 0.95;
+    }
+
+    .section-guide {
+      max-width: 980px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 16px;
+      background: rgba(2, 19, 31, 0.45);
+      padding: 10px 12px;
+    }
+
+    .section-kicker {
+      margin: 0 0 8px;
+      font-family: "IBM Plex Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.72rem;
+      color: #ffd9b0;
+      opacity: 0.95;
+    }
+
+    .quick-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-point {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.76rem;
+      border-radius: 999px;
+      padding: 5px 10px;
+      color: #fff5e7;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(255, 127, 80, 0.17);
+    }
+
+    .controls {
+      position: fixed;
+      right: clamp(10px, 2vw, 24px);
+      bottom: clamp(10px, 2vw, 24px);
+      z-index: 4;
+      display: flex;
+      gap: 8px;
+      background: rgba(2, 19, 31, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 8px;
+      backdrop-filter: blur(6px);
+    }
+
+    .controls button {
+      border: none;
+      background: #e8f1f8;
+      color: #0f2437;
+      font-weight: 700;
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: 0.01em;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: transform 180ms ease, background-color 180ms ease;
+    }
+
+    .controls button:hover {
+      transform: translateY(-1px);
+      background: #fff;
+    }
+
+    .controls button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .explain-toggle {
+      justify-self: start;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 127, 80, 0.2);
+      color: #fff7ec;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 9px 14px;
+      cursor: pointer;
+      transition: background-color 180ms ease, transform 180ms ease;
+    }
+
+    .explain-toggle:hover {
+      background: rgba(255, 127, 80, 0.34);
+      transform: translateY(-1px);
+    }
+
+    .deep-dive {
+      max-width: 980px;
+      border: 1px dashed rgba(255, 255, 255, 0.35);
+      background: rgba(2, 19, 31, 0.48);
+      border-radius: 16px;
+      padding: 16px 18px;
+      display: none;
+    }
+
+    .deep-dive.open {
+      display: block;
+      animation: reveal 320ms ease forwards;
+    }
+
+    .deep-title {
+      margin: 0 0 8px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.77rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ffd9b0;
+    }
+
+    .deep-dive p {
+      margin: 0;
+      color: #f2f8fc;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .progress-wrap {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 5;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--bg-3));
+      transition: width 260ms ease;
+    }
+
+    .counter {
+      position: fixed;
+      left: clamp(10px, 2vw, 24px);
+      bottom: clamp(10px, 2vw, 24px);
+      z-index: 4;
+      background: rgba(2, 19, 31, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.86rem;
+      letter-spacing: 0.03em;
+      color: #fff6e8;
+    }
+
+    @media (max-width: 740px) {
+      .slide {
+        padding-top: 80px;
+        padding-bottom: 120px;
+      }
+
+      .controls {
+        right: 8px;
+        left: 8px;
+        justify-content: center;
+      }
+
+      .controls button {
+        flex: 1;
+      }
+
+      .split {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="progress-wrap" aria-hidden="true"><div class="progress" id="progress"></div></div>
+
+  <main class="deck" id="deck" aria-label="Multithreading and Dining Philosophers Presentation">
+    <section class="slide" id="s1" style="--i:1">
+      <p class="meta">1. Multithreading concept</p>
+      <h1>Multithreading means multiple paths of execution in one process.</h1>
+      <p class="lead">One application can do several tasks at the same time by splitting work into threads that share the same memory space.</p>
+      <div class="split">
+        <div class="card">
+          <p>Think of one process as a kitchen, and threads as chefs in that kitchen. They use the same ingredients (memory), but each chef does a different action in parallel.</p>
+          <div class="chips">
+            <span class="chip">Shared heap</span>
+            <span class="chip">Own stack</span>
+            <span class="chip">Concurrent tasks</span>
+          </div>
+        </div>
+        <div class="diagram" aria-label="Process and thread relationship diagram">
+          <p class="diagram-title">Diagram: Process vs Threads</p>
+          <svg viewBox="0 0 420 220" role="img" aria-label="One process containing three threads">
+            <rect x="10" y="10" width="400" height="200" rx="16" fill="rgba(1,17,28,0.55)" stroke="rgba(255,255,255,0.35)"/>
+            <text x="28" y="40" fill="#ffe7cb" font-size="16" font-family="IBM Plex Mono">Process Memory Space</text>
+            <rect x="28" y="56" width="364" height="36" rx="10" fill="rgba(255,127,80,0.25)" stroke="rgba(255,127,80,0.9)"/>
+            <text x="40" y="79" fill="#fff" font-size="13" font-family="Space Grotesk">Shared Heap + Shared Global Data</text>
+            <rect x="28" y="112" width="108" height="70" rx="10" fill="rgba(236,179,101,0.20)" stroke="rgba(236,179,101,0.95)"/>
+            <rect x="156" y="112" width="108" height="70" rx="10" fill="rgba(236,179,101,0.20)" stroke="rgba(236,179,101,0.95)"/>
+            <rect x="284" y="112" width="108" height="70" rx="10" fill="rgba(236,179,101,0.20)" stroke="rgba(236,179,101,0.95)"/>
+            <text x="56" y="148" fill="#fff" font-size="12" font-family="IBM Plex Mono">Thread A</text>
+            <text x="184" y="148" fill="#fff" font-size="12" font-family="IBM Plex Mono">Thread B</text>
+            <text x="312" y="148" fill="#fff" font-size="12" font-family="IBM Plex Mono">Thread C</text>
+            <text x="52" y="166" fill="#d7e3ea" font-size="11" font-family="IBM Plex Mono">Own stack</text>
+            <text x="180" y="166" fill="#d7e3ea" font-size="11" font-family="IBM Plex Mono">Own stack</text>
+            <text x="308" y="166" fill="#d7e3ea" font-size="11" font-family="IBM Plex Mono">Own stack</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s2" style="--i:2">
+      <p class="meta">2. Why multithreading exists</p>
+      <h2>It improves responsiveness and resource usage.</h2>
+      <div class="card"><p>Without threads, a single long task can freeze everything else. With threads, one task can wait for I/O while another continues computing, so users feel smoother performance and CPUs waste less time.</p></div>
+      <div class="card"><p>Presentation cue: mention common apps. Browser tabs, game engines, and servers all separate work into threads so one slow operation does not block the whole experience.</p></div>
+    </section>
+
+    <section class="slide" id="s3" style="--i:3">
+      <p class="meta">3. CPU + cores concept</p>
+      <h2>Cores are real parallel workers in hardware.</h2>
+      <div class="split">
+        <div class="card"><p>Each CPU core can run one thread at a time (ignoring SMT details). More cores means more true parallel execution. When threads outnumber cores, the OS time-slices them.</p></div>
+        <div class="diagram" aria-label="CPU core assignment diagram">
+          <p class="diagram-title">Diagram: 6 Threads on 2 Cores</p>
+          <svg viewBox="0 0 420 220" role="img" aria-label="Two cores time-slicing six threads">
+            <rect x="18" y="30" width="180" height="160" rx="14" fill="rgba(2,19,31,0.55)" stroke="rgba(255,255,255,0.3)"/>
+            <rect x="222" y="30" width="180" height="160" rx="14" fill="rgba(2,19,31,0.55)" stroke="rgba(255,255,255,0.3)"/>
+            <text x="76" y="55" fill="#ffe7cb" font-size="13" font-family="IBM Plex Mono">CORE 0</text>
+            <text x="280" y="55" fill="#ffe7cb" font-size="13" font-family="IBM Plex Mono">CORE 1</text>
+            <rect x="34" y="72" width="148" height="24" rx="8" fill="rgba(255,127,80,0.7)"/>
+            <rect x="34" y="106" width="148" height="24" rx="8" fill="rgba(255,127,80,0.5)"/>
+            <rect x="34" y="140" width="148" height="24" rx="8" fill="rgba(255,127,80,0.35)"/>
+            <rect x="238" y="72" width="148" height="24" rx="8" fill="rgba(236,179,101,0.75)"/>
+            <rect x="238" y="106" width="148" height="24" rx="8" fill="rgba(236,179,101,0.55)"/>
+            <rect x="238" y="140" width="148" height="24" rx="8" fill="rgba(236,179,101,0.35)"/>
+            <text x="45" y="89" fill="#001" font-size="11" font-family="IBM Plex Mono">T1 then T3 then T5</text>
+            <text x="249" y="89" fill="#001" font-size="11" font-family="IBM Plex Mono">T2 then T4 then T6</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s4" style="--i:4">
+      <p class="meta">4. OS scheduler role</p>
+      <h2>The scheduler decides which runnable thread gets CPU time.</h2>
+      <div class="card"><p>It applies policies like fairness and priority. The scheduler is the traffic controller between ready threads and available CPU cores.</p></div>
+      <div class="card"><p>Use this line in your talk: scheduler decisions are small and repeated very fast, so overall behavior emerges from thousands of tiny choices per second.</p></div>
+    </section>
+
+    <section class="slide" id="s5" style="--i:5">
+      <p class="meta">5. Thread lifecycle</p>
+      <h2>READY → RUNNING → BLOCKED/DELAYED transitions happen constantly.</h2>
+      <div class="split">
+        <div class="card"><p>A thread in READY waits for CPU, RUNNING executes instructions, BLOCKED waits for a resource, and DELAYED sleeps until a timer expires. The scheduler moves threads between these states.</p></div>
+        <div class="diagram" aria-label="Thread state machine diagram">
+          <p class="diagram-title">Diagram: Thread Lifecycle</p>
+          <svg viewBox="0 0 420 240" role="img" aria-label="Ready Running Blocked Delayed with transitions">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="#ffdfb8" />
+              </marker>
+            </defs>
+            <rect x="20" y="30" width="110" height="50" rx="10" fill="rgba(255,127,80,0.35)" stroke="#ff7f50"/>
+            <rect x="160" y="30" width="110" height="50" rx="10" fill="rgba(236,179,101,0.35)" stroke="#ecb365"/>
+            <rect x="290" y="30" width="110" height="50" rx="10" fill="rgba(180,220,255,0.25)" stroke="#b8dcff"/>
+            <rect x="160" y="150" width="110" height="50" rx="10" fill="rgba(210,170,255,0.22)" stroke="#dcb4ff"/>
+            <text x="53" y="60" fill="#fff" font-family="IBM Plex Mono" font-size="12">READY</text>
+            <text x="187" y="60" fill="#fff" font-family="IBM Plex Mono" font-size="12">RUNNING</text>
+            <text x="317" y="60" fill="#fff" font-family="IBM Plex Mono" font-size="12">BLOCKED</text>
+            <text x="188" y="180" fill="#fff" font-family="IBM Plex Mono" font-size="12">DELAYED</text>
+            <line x1="130" y1="55" x2="160" y2="55" stroke="#ffdfb8" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="215" y1="80" x2="215" y2="150" stroke="#ffdfb8" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="270" y1="55" x2="290" y2="55" stroke="#ffdfb8" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="290" y1="80" x2="260" y2="150" stroke="#ffdfb8" stroke-width="2" marker-end="url(#arrow)"/>
+            <line x1="160" y1="175" x2="80" y2="80" stroke="#ffdfb8" stroke-width="2" marker-end="url(#arrow)"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s6" style="--i:6">
+      <p class="meta">6. Context switching</p>
+      <h2>Switching threads means saving one state and restoring another.</h2>
+      <div class="card"><p>The OS stores registers/program counter of the current thread and loads the next thread context. This enables concurrency but costs overhead, so too many switches hurt performance.</p></div>
+      <div class="card"><p>Quick example: if a lock is held for 2 ms but switching happens every 0.2 ms, threads can waste significant time bouncing between run queues instead of finishing useful work.</p></div>
+    </section>
+
+    <section class="slide" id="s7" style="--i:7">
+      <p class="meta">7. Race condition problem</p>
+      <h2>Concurrent access to shared data can produce unpredictable results.</h2>
+      <div class="card"><p>If two threads update the same variable without coordination, operation order becomes nondeterministic. Final output can differ every run.</p></div>
+      <div class="card"><p>Explain in one sentence: read-modify-write is not atomic by default, so two increments can collapse into one observed update.</p></div>
+    </section>
+
+    <section class="slide" id="s8" style="--i:8">
+      <p class="meta">8. Synchronization need</p>
+      <h2>We need rules for safe access to shared resources.</h2>
+      <div class="card"><p>Synchronization primitives like mutexes and condition variables control who can enter critical sections and when.</p></div>
+      <div class="chips">
+        <span class="chip">Mutex: one owner</span>
+        <span class="chip">Safe scheduling</span>
+        <span class="chip">CondVar: wait + signal</span>
+      </div>
+    </section>
+
+    <section class="slide" id="s9" style="--i:9">
+      <p class="meta">9. Introduce Producer-Consumer Problem</p>
+      <h2>A simpler, clearer model for thread coordination.</h2>
+      <div class="split">
+        <div class="card"><p>Producer threads generate items and place them in a shared buffer. Consumer threads take items out. The buffer has fixed size, so producers wait when full and consumers wait when empty. Simple but powerful.</p></div>
+        <div class="diagram" aria-label="Producer-Consumer buffer diagram">
+          <p class="diagram-title">Diagram: Producer-Consumer Setup</p>
+          <svg viewBox="0 0 420 240" role="img" aria-label="Producers feeding buffer, consumers taking from buffer">
+            <rect x="20" y="30" width="70" height="50" rx="10" fill="rgba(255,127,80,0.8)"/>
+            <text x="35" y="65" fill="#001" font-size="12" font-family="IBM Plex Mono">PROD 1</text>
+            <rect x="20" y="120" width="70" height="50" rx="10" fill="rgba(255,127,80,0.8)"/>
+            <text x="35" y="155" fill="#001" font-size="12" font-family="IBM Plex Mono">PROD 2</text>
+            <rect x="130" y="60" width="200" height="120" rx="10" fill="rgba(2,19,31,0.5)" stroke="rgba(255,255,255,0.35)"/>
+            <text x="150" y="85" fill="#ffe7cb" font-size="13" font-family="IBM Plex Mono">← Shared Buffer (max N items) →</text>
+            <rect x="150" y="100" width="160" height="60" rx="6" fill="rgba(236,179,101,0.25)" stroke="rgba(236,179,101,0.8)"/>
+            <text x="230" y="137" text-anchor="middle" fill="#fff" font-size="11" font-family="IBM Plex Mono">Item Queue</text>
+            <rect x="330" y="30" width="70" height="50" rx="10" fill="rgba(184,220,255,0.85)"/>
+            <text x="345" y="65" fill="#001" font-size="12" font-family="IBM Plex Mono">CONS 1</text>
+            <rect x="330" y="120" width="70" height="50" rx="10" fill="rgba(184,220,255,0.85)"/>
+            <text x="345" y="155" fill="#001" font-size="12" font-family="IBM Plex Mono">CONS 2</text>
+            <path d="M90 55 L130 110" stroke="rgba(255,127,80,0.7)" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M90 145 L130 130" stroke="rgba(255,127,80,0.7)" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M330 55 L330 130" stroke="rgba(184,220,255,0.7)" stroke-width="2"/>
+            <path d="M330 145 L330 170" stroke="rgba(184,220,255,0.7)" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s10" style="--i:10">
+      <p class="meta">10. Map problem to threads + resources</p>
+      <h2>Producers/consumers = threads, buffer = shared resource.</h2>
+      <div class="card"><p>One or more producer threads generate data items. One or more consumer threads extract items. The bounded buffer is the critical shared resource that requires synchronization.</p></div>
+      <div class="card"><p>Simple code loop: producers do produce() then lock/add-to-buffer/unlock. Consumers do lock/check-if-empty/take-from-buffer/unlock then process().</p></div>
+    </section>
+
+    <section class="slide" id="s11" style="--i:11">
+      <p class="meta">11. Shared resource conflict</p>
+      <h2>Conflict happens when multiple threads access buffer simultaneously.</h2>
+      <div class="card"><p>Two producers cannot modify buffer at the same time. A producer and consumer cannot access it together. The buffer index, item count, and stored data are all shared state that require atomic access.</p></div>
+      <div class="card"><p>Teaching cue: this mirrors real systems—queues in OS kernels, thread pools, message passing—all use similar buffer-based coordination.</p></div>
+    </section>
+
+    <section class="slide" id="s12" style="--i:12">
+      <p class="meta">12. Deadlock explanation</p>
+      <h2>Deadlock: no progress if bad lock discipline happens.</h2>
+      <div class="split">
+        <div class="card"><p>If a producer holds buffer-lock and then tries to acquire an internal condition variable lock while a consumer holds it and waits for buffer-lock, deadlock forms. Circular wait with arbitrary mutex ordering causes freeze.</p></div>
+        <div class="diagram" aria-label="Deadlock scenario diagram">
+          <p class="diagram-title">Diagram: Lock Deadlock</p>
+          <svg viewBox="0 0 420 240" role="img" aria-label="Producer waits for consumer lock, consumer waits for producer lock">
+            <rect x="30" y="40" width="140" height="60" rx="10" fill="rgba(255,127,80,0.3)" stroke="#ff7f50"/>
+            <rect x="250" y="40" width="140" height="60" rx="10" fill="rgba(184,220,255,0.3)" stroke="#b8dcff"/>
+            <text x="100" y="65" fill="#fff" font-size="12" font-family="IBM Plex Mono">PRODUCER</text>
+            <text x="100" y="85" fill="#fff" font-size="11" font-family="IBM Plex Mono">Holds: MUTEX</text>
+            <text x="320" y="65" fill="#fff" font-size="12" font-family="IBM Plex Mono">CONSUMER</text>
+            <text x="320" y="85" fill="#fff" font-size="11" font-family="IBM Plex Mono">Holds: COND_VAR</text>
+            <path d="M170 100 Q210 130 250 100" fill="none" stroke="#ff7f50" stroke-width="2.5" marker-end="url(#arrow2)"/>
+            <path d="M250 140 Q210 170 170 140" fill="none" stroke="#b8dcff" stroke-width="2.5" marker-end="url(#arrow2)"/>
+            <text x="210" y="135" fill="#ffb88c" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">WAIT</text>
+            <text x="210" y="175" fill="#b8dcff" font-size="10" text-anchor="middle" font-family="IBM Plex Mono">WAIT</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s13" style="--i:13">
+      <p class="meta">13. Starvation problem</p>
+      <h2>Starvation: one consumer never gets items even though system works.</h2>
+      <div class="split">
+        <div class="card"><p>If scheduler always picks the same producers/consumers in a loop, others starve. Items flow but some threads never wake or get CPU time. Fairness fails while livelock-style spinning happens.</p></div>
+        <div class="diagram" aria-label="Starvation timeline diagram">
+          <p class="diagram-title">Diagram: Unequal Access</p>
+          <svg viewBox="0 0 420 220" role="img" aria-label="Timeline: Producers 1-3 active, Producer 4 blocked forever">
+            <line x1="30" y1="40" x2="390" y2="40" stroke="#b8dcff"/>
+            <line x1="30" y1="90" x2="390" y2="90" stroke="#b8dcff"/>
+            <line x1="30" y1="140" x2="390" y2="140" stroke="#b8dcff"/>
+            <line x1="30" y1="190" x2="390" y2="190" stroke="#b8dcff"/>
+            <text x="8" y="44" fill="#ffe7cb" font-size="11">PROD1</text>
+            <text x="8" y="94" fill="#ffe7cb" font-size="11">PROD2</text>
+            <text x="8" y="144" fill="#ffe7cb" font-size="11">PROD3</text>
+            <text x="8" y="194" fill="#ffe7cb" font-size="11">PROD4</text>
+            <rect x="50" y="30" width="55" height="20" rx="5" fill="#ff7f50"/>
+            <rect x="125" y="30" width="55" height="20" rx="5" fill="#ff7f50"/>
+            <rect x="200" y="30" width="55" height="20" rx="5" fill="#ff7f50"/>
+            <rect x="50" y="80" width="55" height="20" rx="5" fill="#ecb365"/>
+            <rect x="125" y="80" width="55" height="20" rx="5" fill="#ecb365"/>
+            <rect x="200" y="80" width="55" height="20" rx="5" fill="#ecb365"/>
+            <rect x="50" y="130" width="55" height="20" rx="5" fill="#ffb66a"/>
+            <rect x="125" y="130" width="55" height="20" rx="5" fill="#ffb66a"/>
+            <rect x="200" y="130" width="55" height="20" rx="5" fill="#ffb66a"/>
+            <rect x="360" y="180" width="25" height="20" rx="5" fill="rgba(184,220,255,0.35)" stroke="#b8dcff" stroke-dasharray="3,2"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s14" style="--i:14">
+      <p class="meta">14. Solution: Mutex + Condition Variables</p>
+      <h2>Proper synchronization prevents deadlock and starvation.</h2>
+      <div class="split">
+        <div class="card"><p>Use a single mutex to protect buffer access, plus two condition variables: notEmpty (signals consumers) and notFull (signals producers). Producers signal notEmpty when adding; consumers signal notFull when removing. No circular locks, no missed wakes.</p></div>
+        <div class="diagram" aria-label="Mutex and condition variable coordination">
+          <p class="diagram-title">Diagram: Sync Primitives</p>
+          <svg viewBox="0 0 420 220" role="img" aria-label="Mutex protects buffer, cvar signals wake-ups">
+            <rect x="30" y="30" width="150" height="170" rx="10" fill="rgba(2,19,31,0.4)" stroke="rgba(255,255,255,0.25)"/>
+            <text x="50" y="55" fill="#ffe7cb" font-size="12" font-family="IBM Plex Mono">MUTEX</text>
+            <rect x="60" y="70" width="100" height="50" rx="8" fill="rgba(255,127,80,0.35)" stroke="#ff7f50"/>
+            <text x="110" y="100" text-anchor="middle" fill="#fff" font-size="11" font-family="IBM Plex Mono">Buffer</text>
+            <rect x="50" y="135" width="120" height="45" rx="8" fill="rgba(236,179,101,0.25)" stroke="#ecb365"/>
+            <text x="110" y="156" text-anchor="middle" fill="#fff" font-size="11" font-family="IBM Plex Mono">owner: one thread</text>
+            <rect x="200" y="30" width="80" height="170" rx="10" fill="rgba(2,19,31,0.4)" stroke="rgba(255,255,255,0.25)"/>
+            <text x="215" y="55" fill="#ffe7cb" font-size="12" font-family="IBM Plex Mono">COND_VAR</text>
+            <rect x="210" y="70" width="60" height="45" rx="6" fill="rgba(184,220,255,0.3)" stroke="#b8dcff"/>
+            <text x="240" y="100" text-anchor="middle" fill="#fff" font-size="10" font-family="IBM Plex Mono">notEmpty</text>
+            <rect x="210" y="130" width="60" height="45" rx="6" fill="rgba(184,220,255,0.3)" stroke="#b8dcff"/>
+            <text x="240" y="160" text-anchor="middle" fill="#fff" font-size="10" font-family="IBM Plex Mono">notFull</text>
+            <path d="M150 100 L200 100" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s15" style="--i:15">
+      <p class="meta">15. Thread blocking behavior</p>
+      <h2>Threads block efficiently on synchronization primitives.</h2>
+      <div class="card"><p>When a consumer tries to take from empty buffer, it calls wait() on notEmpty condition variable. The thread releases the mutex, sleeps in kernel, and wakes only when producer signals notEmpty. No CPU burned.</p></div>
+      <div class="card"><p>Key pattern: lock → check condition → if false, wait(cond_var) → unlocks and sleeps → wakes → recheck condition → proceed → unlock.</p></div>
+    </section>
+
+    <section class="slide" id="s16" style="--i:16">
+      <p class="meta">16. Scheduler interaction during blocking</p>
+      <h2>Blocked threads move from ready queue to wait queues.</h2>
+      <div class="split">
+        <div class="card"><p>When a thread calls wait() on a condition variable, it exits the CPU and joins a wait queue attached to that variable. The scheduler skips it and runs other ready threads. When signaled, it moves back to ready queue.</p></div>
+        <div class="diagram" aria-label="Queue state diagram">
+          <p class="diagram-title">Diagram: Queue Transitions</p>
+          <svg viewBox="0 0 420 220" role="img" aria-label="Thread moves from ready to wait queue on condition variable">
+            <rect x="18" y="40" width="110" height="140" rx="10" fill="rgba(255,127,80,0.2)" stroke="#ff7f50"/>
+            <text x="50" y="60" fill="#fff" font-size="12" font-family="IBM Plex Mono">READY</text>
+            <rect x="38" y="75" width="70" height="30" rx="6" fill="#ff7f50"/>
+            <text x="73" y="95" text-anchor="middle" fill="#001" font-size="11">T1, T3</text>
+            <rect x="155" y="40" width="110" height="140" rx="10" fill="rgba(236,179,101,0.2)" stroke="#ecb365"/>
+            <text x="185" y="60" fill="#fff" font-size="12" font-family="IBM Plex Mono">CPU</text>
+            <rect x="172" y="75" width="76" height="30" rx="6" fill="#ecb365"/>
+            <text x="210" y="95" text-anchor="middle" fill="#001" font-size="11">T2</text>
+            <rect x="292" y="40" width="110" height="140" rx="10" fill="rgba(184,220,255,0.2)" stroke="#b8dcff"/>
+            <text x="318" y="60" fill="#fff" font-size="12" font-family="IBM Plex Mono">WAIT</text>
+            <rect x="312" y="75" width="70" height="30" rx="6" fill="#b8dcff"/>
+            <text x="347" y="95" text-anchor="middle" fill="#001" font-size="11">T4, T5</text>
+            <text x="120" y="135" fill="#fff" font-size="10" font-family="IBM Plex Mono">dispatch</text>
+            <text x="267" y="110" fill="#fff" font-size="10" font-family="IBM Plex Mono">wait()</text>
+            <text x="280" y="145" fill="#fff" font-size="10" font-family="IBM Plex Mono">signal()</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s17" style="--i:17">
+      <p class="meta">17. Full producer-consumer lifecycle loop</p>
+      <h2>Produce → lock → check full → add item → signal → unlock → repeat.</h2>
+      <div class="card"><p>Producer generates item, locks mutex, checks if full (waits if so), inserts item, signals notEmpty, unlocks. Consumer: locks, checks empty (waits if so), takes item, signals notFull, unlocks, processes. Smooth flow under scheduler control.</p></div>
+      <div class="chips">
+        <span class="chip">Generate/consume</span>
+        <span class="chip">Mutex protection</span>
+        <span class="chip">Condition signal</span>
+      </div>
+    </section>
+
+    <section class="slide" id="s18" style="--i:18">
+      <p class="meta">18. Final system behavior summary (OS view)</p>
+      <h2>Producer-Consumer is a real, practical pattern used everywhere.</h2>
+      <div class="card"><p>From OS device drivers to thread pools to message queues: the producer-consumer pattern is the foundation of modern concurrent systems. Proper mutex + condition variable design prevents deadlock and starvation.</p></div>
+      <div class="card"><p>Final speaking line: start with correctness via clear synchronization, then tune for fairness and performance. A fast concurrent system with bugs is worthless; a slow but correct system can be optimized.</p></div>
+      <p class="lead">End of talk: from hardware and scheduling fundamentals to real producer-consumer coordination in concurrent systems.</p>
+      <p class="lead author-credit">Created By: hicham Elhamoudi and Youssef Taoussi</p>
+    </section>
+  </main>
+
+  <div class="counter" id="counter">Slide 1 / 18</div>
+
+  <nav class="controls" aria-label="Slide navigation controls">
+    <button id="prevBtn" type="button">Previous</button>
+    <button id="nextBtn" type="button">Next</button>
+  </nav>
+
+  <script>
+    const deck = document.getElementById("deck");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const counter = document.getElementById("counter");
+    const progress = document.getElementById("progress");
+
+    const deepDiveContent = {
+      s1: "A thread has its own stack and program counter, but shares code, heap, and globals with sibling threads. This is why thread communication is easy but data corruption risk is high without locking.",
+      s2: "The key motivation is overlap: CPU work can continue while another thread waits on disk, network, or user input. This cuts idle time and improves perceived speed.",
+      s3: "Parallelism is limited by physical cores. If you run N runnable threads on M cores where N > M, each core time-slices threads and no thread runs continuously.",
+      s4: "Schedulers track priorities, fairness, time slices, and wake-up events. Tiny policy differences can change throughput, latency, and starvation behavior dramatically.",
+      s5: "READY means eligible for CPU, RUNNING means executing, BLOCKED means waiting for an event/resource, and DELAYED means sleeping until a timer. State changes are event-driven.",
+      s6: "Context switch saves registers, stack pointer, and instruction pointer of one thread, then restores another. It enables concurrency but adds cache and scheduling overhead.",
+      s7: "A race happens because operations like increment are multi-step: read, add, write. If interleaved, one update can overwrite another unless protected.",
+      s8: "Synchronization gives ordering guarantees. Mutexes enforce exclusive access, and condition variables coordinate wait/signal behavior.",
+      s9: "Producer-Consumer is a canonical pattern: one or more threads produce data, one or more consume it, a shared bounded buffer mediates. It is simple, practical, and captures all the core threading issues.",
+      s10: "Producers generate items and call add(item) while holding mutex. Consumers call take() to retrieve items. Both must coordinate on buffer capacity and emptiness via condition variables.",
+      s11: "Buffer access is the critical resource. If two threads modify buffer without locking, index corruption and lost items result. The shared buffer, count, and item array all require atomic protection.",
+      s12: "Deadlock can occur with bad lock ordering: if producer locks A then tries to lock B, while consumer locks B then tries to lock A, both wait forever. Condition variables have their own internal locks to avoid this.",
+      s13: "Starvation happens if the scheduler always picks the same producer/consumer threads in a loop. Other threads spin waiting for CPU time but never get it, so they never add/remove buffer items.",
+      s14: "Solution: single mutex protecting the buffer plus two condition variables: notEmpty wakes consumers when items arrive, notFull wakes producers when space opens. No circular waits, proper signaling.",
+      s15: "When a consumer checks if buffer is empty and it is, it calls wait(notEmpty). This atomically unlocks the mutex and sleeps. It wakes only when producer signals notEmpty after adding an item.",
+      s16: "Signal moves threads from wait queue to ready queue, but they still compete for CPU. A signaled thread is not immediately running; the scheduler decides if/when to run it next.",
+      s17: "The loop naturally balances: producers add when space available, consumers take when items available. Both use wait/signal to sleep rather than spin. Real systems use this everywhere."
+    };
+
+    const sectionGuides = {
+      s1: ["Core idea", "Shared memory", "Parallel flow"],
+      s2: ["Why needed", "Responsiveness", "Efficiency"],
+      s3: ["Hardware model", "Cores vs threads", "Time slicing"],
+      s4: ["OS control", "Policy", "Fair dispatch"],
+      s5: ["Thread states", "Transitions", "Execution flow"],
+      s6: ["State save/restore", "Overhead", "Performance cost"],
+      s7: ["Data hazard", "Non-atomic ops", "Wrong output"],
+      s8: ["Safety tools", "Locking", "Coordination"],
+      s9: ["Problem setup", "Producer", "Consumer"],
+      s10: ["Thread mapping", "Shared buffer", "Critical section"],
+      s11: ["Contention", "Shared state", "Atomic access"],
+      s12: ["Deadlock risk", "Circular wait", "Lock order"],
+      s13: ["Fairness", "Starvation", "Scheduling"],
+      s14: ["Correct solution", "Mutex", "Condition variables"],
+      s15: ["Blocking", "Wait/signal", "No busy spin"],
+      s16: ["Queue moves", "Wake-up", "Scheduler handoff"],
+      s17: ["Lifecycle loop", "Flow control", "System rhythm"],
+      s18: ["Takeaway", "Correctness first", "Real-world use"]
+    };
+
+    let activeIndex = 0;
+
+    function toConciseSentence(text) {
+      const trimmed = text.trim().replace(/\s+/g, " ");
+      const splitIndex = trimmed.search(/[.!?]/);
+      if (splitIndex === -1) {
+        return trimmed;
+      }
+      return trimmed.slice(0, splitIndex + 1);
+    }
+
+    function makeCardsConcise() {
+      document.querySelectorAll(".card p").forEach((paragraph) => {
+        paragraph.textContent = toConciseSentence(paragraph.textContent);
+        paragraph.classList.add("concise");
+      });
+    }
+
+    function injectSectionGuides() {
+      slides.forEach((slide) => {
+        const points = sectionGuides[slide.id];
+        if (!points) {
+          return;
+        }
+
+        const heading = slide.querySelector("h1, h2");
+        if (!heading) {
+          return;
+        }
+
+        const guide = document.createElement("div");
+        guide.className = "section-guide";
+
+        const kicker = document.createElement("p");
+        kicker.className = "section-kicker";
+        kicker.textContent = "Section Focus";
+
+        const pointsWrap = document.createElement("div");
+        pointsWrap.className = "quick-points";
+
+        points.forEach((point) => {
+          const chip = document.createElement("span");
+          chip.className = "quick-point";
+          chip.textContent = point;
+          pointsWrap.appendChild(chip);
+        });
+
+        guide.appendChild(kicker);
+        guide.appendChild(pointsWrap);
+        heading.insertAdjacentElement("afterend", guide);
+      });
+    }
+
+    function injectExplainButtons() {
+      slides.forEach((slide, index) => {
+        const detail = deepDiveContent[slide.id];
+        if (!detail) {
+          return;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "explain-toggle";
+        button.textContent = `Explain More (${index + 1})`;
+
+        const panel = document.createElement("div");
+        panel.className = "deep-dive";
+        panel.id = `deep-${slide.id}`;
+        panel.innerHTML = `<p>${detail}</p>`;
+
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("aria-controls", panel.id);
+
+        button.addEventListener("click", () => {
+          const isOpen = panel.classList.toggle("open");
+          button.setAttribute("aria-expanded", String(isOpen));
+          button.textContent = isOpen ? `Hide Details (${index + 1})` : `Explain More (${index + 1})`;
+        });
+
+        slide.appendChild(button);
+        slide.appendChild(panel);
+      });
+    }
+
+    function goToSlide(index) {
+      const clamped = Math.max(0, Math.min(slides.length - 1, index));
+      slides[clamped].scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function updateUI(index) {
+      activeIndex = index;
+      counter.textContent = `Slide ${index + 1} / ${slides.length}`;
+      progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === slides.length - 1;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = slides.indexOf(entry.target);
+            if (idx >= 0) {
+              updateUI(idx);
+            }
+          }
+        });
+      },
+      {
+        root: deck,
+        threshold: 0.6
+      }
+    );
+
+    slides.forEach((slide) => observer.observe(slide));
+
+    prevBtn.addEventListener("click", () => goToSlide(activeIndex - 1));
+    nextBtn.addEventListener("click", () => goToSlide(activeIndex + 1));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown") {
+        goToSlide(activeIndex + 1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        goToSlide(activeIndex - 1);
+      }
+    });
+
+    makeCardsConcise();
+    injectSectionGuides();
+    injectExplainButtons();
+
+    updateUI(0);
+  </script>
+</body>
+</html>
