@@ -259,9 +259,31 @@
       transition: transform 180ms ease, background-color 180ms ease;
     }
 
+    .controls .docs-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: none;
+      background: #ffdcb0;
+      color: #2b1f13;
+      font-weight: 700;
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: 0.01em;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: transform 180ms ease, background-color 180ms ease;
+    }
+
     .controls button:hover {
       transform: translateY(-1px);
       background: #fff;
+    }
+
+    .controls .docs-link:hover {
+      transform: translateY(-1px);
+      background: #ffe9c7;
     }
 
     .controls button:disabled {
@@ -692,6 +714,7 @@
   <nav class="controls" aria-label="Slide navigation controls">
     <button id="prevBtn" type="button">Previous</button>
     <button id="nextBtn" type="button">Next</button>
+    <a class="docs-link" href="./pdfs.html">PDFs</a>
   </nav>
 
   <script>
